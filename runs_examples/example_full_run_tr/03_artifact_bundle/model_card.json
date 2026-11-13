@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "artifact_id": "stds_kernel_ridge_rbf_stds_synth_20261113_032701",
+  "artifact_id": "stds_kernel_ridge_rbf_stds_synth_20261113_041202",
   "semantic_version": "0.1.0",
   "model_name": "kernel_ridge_rbf",
   "model_family": "kernel_method",

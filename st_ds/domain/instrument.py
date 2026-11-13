@@ -7,7 +7,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any
+import json
+from pathlib import Path
+from typing import Any, Mapping
 
 import numpy as np
 
@@ -158,7 +160,30 @@ class InstrumentProfile:
             "has_carbonate_bands": self.has_carbonate_bands,
             "calibration_file_id": self.calibration_file_id,
             "description": self.description,
+            "metadata": dict(self.metadata),
         }
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> InstrumentProfile:
+        """Reconstruct an `InstrumentProfile` from a serialized dictionary."""
+        try:
+            fwhm_raw = data.get("fwhm_nm")
+            return cls(
+                profile_id=str(data["profile_id"]),
+                sensor_model=str(data.get("sensor_model", data["profile_id"])),
+                modality=SpectralModality(str(data.get("modality", "vis_nir_swir"))),
+                wavelength_grid_nm=tuple(float(w) for w in data["wavelength_grid_nm"]),
+                channel_ids=tuple(str(c) for c in data["channel_ids"]),
+                fwhm_nm=tuple(float(f) for f in fwhm_raw) if fwhm_raw is not None else None,
+                calibration_file_id=str(data.get("calibration_file_id", "default_cal_v1")),
+                description=str(data.get("description", "")),
+                metadata=dict(data.get("metadata") or {}),
+            )
+        except (KeyError, TypeError, ValueError) as exc:
+            raise SchemaError(
+                f"Malformed InstrumentProfile payload: {exc}",
+                details={"profile_id": data.get("profile_id") if isinstance(data, Mapping) else None},
+            ) from exc
 
 
 def _build_builtin_profiles() -> dict[str, InstrumentProfile]:
@@ -252,3 +277,18 @@ def get_builtin_profile(profile_id: str) -> InstrumentProfile:
             details={"profile_id": profile_id, "available_profiles": list(BUILTIN_PROFILES.keys())},
         )
     return BUILTIN_PROFILES[profile_id]
+
+
+def resolve_instrument_profile(profile_id_or_path: str | Path) -> InstrumentProfile:
+    """Resolve either a built-in profile ID or a JSON file defining an `InstrumentProfile`."""
+    raw = str(profile_id_or_path).strip()
+    if raw in BUILTIN_PROFILES:
+        return BUILTIN_PROFILES[raw]
+    candidate = Path(raw)
+    if candidate.is_file():
+        payload = json.loads(candidate.read_text(encoding="utf-8"))
+        return InstrumentProfile.from_dict(payload)
+    raise SchemaError(
+        f"Instrument profile '{raw}' is neither a built-in profile ID nor an existing JSON file.",
+        details={"profile_id_or_path": raw, "available_profiles": list(BUILTIN_PROFILES.keys())},
+    )

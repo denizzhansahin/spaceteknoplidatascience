@@ -52,6 +52,7 @@ ACTIVE_DPI="${STDS_DPI:-$("$RESOLVED_PYTHON" -c "import json; print(json.loads('
 TIMESTAMP="$(date '+%Y%m%d_%H%M%S')"
 RUN_DIR="$REPO_ROOT/$RUNS_BASE/${TIMESTAMP}_full_run"
 TARGET="${TARGET:-soc_pct}"
+MODEL="${MODEL:-auto}"
 FOLDS="${FOLDS:-3}"
 EPOCHS="${EPOCHS:-16}"
 SEED="${SEED:-42}"
@@ -65,7 +66,7 @@ echo " [STDS 03] Tam Sistem Çalıştırma Hattı / Full Pipeline Execution"
 echo "------------------------------------------------------------------------"
 echo "  Aktif Dil / Language : $ACTIVE_LANG (.env veya STDS_LANG üzerinden)"
 echo "  Zaman Damgalı Klasör : $RUN_DIR"
-echo "  DPI / Target / Folds : $ACTIVE_DPI DPI | $TARGET | $FOLDS-fold"
+echo "  DPI / Target / Model : $ACTIVE_DPI DPI | $TARGET | $MODEL | $FOLDS-fold"
 echo "========================================================================"
 
 # AŞAMA 1 — Veri Hazırlama (Kullanıcı Girdisi veya Sentetik Üretim)
@@ -97,8 +98,13 @@ if [[ -n "$WET_ARG" && -f "$WET_ARG" && -n "$DRY_ARG" && -f "$DRY_ARG" ]]; then
 fi
 
 MULTI_TARGET_FLAG=()
-if [[ "${MULTI_TARGET:-1}" != "0" ]]; then
-  MULTI_TARGET_FLAG=(--multi-target)
+VALIDATE_SIC_FLAG=()
+if [[ "$TARGET" == "soc_pct" || "$TARGET" == "sic_pct" || "$TARGET" == "tc_pct" ]]; then
+  if [[ "${MULTI_TARGET:-1}" != "0" ]]; then
+    MULTI_TARGET_FLAG=(--multi-target)
+  fi
+else
+  VALIDATE_SIC_FLAG=(--no-require-sic)
 fi
 
 # AŞAMA 2 — Veri Şeması ve Fiziksel Kısıt Doğrulaması
@@ -107,6 +113,8 @@ PYTHONPATH="$REPO_ROOT" "$RESOLVED_PYTHON" -m st_ds.cli dataset validate \
   --input "$INPUT_PATH" \
   ${PROFILE_FLAGS[@]+"${PROFILE_FLAGS[@]}"} \
   --for-training \
+  --target "$TARGET" \
+  ${VALIDATE_SIC_FLAG[@]+"${VALIDATE_SIC_FLAG[@]}"} \
   --output "$RUN_DIR/02_validation_report.json" >/dev/null
 
 # AŞAMA 3 — Gruplanmış CV Benchmark & İmzalı Model Eğitimi
@@ -114,8 +122,9 @@ echo "[3/6] Gruplanmış çapraz doğrulama & SHA-256 model eğitimi (st-ds trai
 PYTHONPATH="$REPO_ROOT" "$RESOLVED_PYTHON" -m st_ds.cli train \
   --input "$INPUT_PATH" \
   --output "$RUN_DIR/03_artifact_bundle" \
-  --model auto \
+  --model "$MODEL" \
   --target "$TARGET" \
+  ${PROFILE_FLAGS[@]+"${PROFILE_FLAGS[@]}"} \
   --folds "$FOLDS" \
   ${EPO_TRAIN_FLAGS[@]+"${EPO_TRAIN_FLAGS[@]}"} \
   ${MULTI_TARGET_FLAG[@]+"${MULTI_TARGET_FLAG[@]}"} \
@@ -130,6 +139,7 @@ echo "[4/6] Tahmin, XAI ve karbon stoku çıkarımı + PDF dışa aktarım (pred
 PYTHONPATH="$REPO_ROOT" "$RESOLVED_PYTHON" -m st_ds.cli predict \
   --artifact "$RUN_DIR/03_artifact_bundle" \
   --input "$INPUT_PATH" \
+  ${PROFILE_FLAGS[@]+"${PROFILE_FLAGS[@]}"} \
   --include-xai \
   --lang "$ACTIVE_LANG" \
   --output "$RUN_DIR/04_predictions.json" >/dev/null
@@ -154,6 +164,7 @@ PYTHONPATH="$REPO_ROOT" "$RESOLVED_PYTHON" -m st_ds.cli visualize \
   ${PROFILE_FLAGS[@]+"${PROFILE_FLAGS[@]}"} \
   ${EPO_VIZ_FLAGS[@]+"${EPO_VIZ_FLAGS[@]}"} \
   --target "$TARGET" \
+  --model "$MODEL" \
   --folds "$FOLDS" \
   --dpi "$ACTIVE_DPI" \
   --format png \

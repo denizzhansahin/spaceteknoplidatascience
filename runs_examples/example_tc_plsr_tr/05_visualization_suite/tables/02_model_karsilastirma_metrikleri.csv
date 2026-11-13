@@ -1,0 +1,6 @@
+Sıra,Model Adı,Model Ailesi,OOF RMSE (%),OOF MAE (%),Bias (%),R²,RPIQ,LoA Alt / Üst
+1,kernel_ridge_rbf,kernel_method,0.9258,0.7783,+0.0675,0.6503,2.303,"[-1.754, +1.889]"
+2,plsr,linear_latent_chemometric,0.9362,0.7912,+0.0617,0.6424,2.278,"[-1.781, +1.904]"
+3,st_soil_hybrid_net,neural_two_branch_physics_constrained,1.1004,0.8477,+0.0116,0.5060,1.938,"[-2.159, +2.182]"
+4,local_plsr_mbl,memory_based_learning,1.1161,0.8425,-0.1571,0.4919,1.911,"[-2.336, +2.022]"
+5,random_forest,tree_ensemble,1.1569,0.9745,+0.1431,0.4540,1.843,"[-2.121, +2.407]"

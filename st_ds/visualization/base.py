@@ -130,6 +130,8 @@ class VisualizationConfig:
     """Configuration for generating the STDS multi-plot scientific visualization suite."""
 
     target_name: str = "soc_pct"
+    model_name: str = "auto"
+    covariate_names: tuple[str, ...] | None = None
     n_folds: int = 4
     formats: tuple[str, ...] = ("png",)
     dpi: int = 160

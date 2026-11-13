@@ -2,7 +2,7 @@
   "artifact_format_version": "1.0.0",
   "schema_version": "1.0.0",
   "metadata": {
-    "artifact_id": "stds_kernel_ridge_rbf_stds_synth_20261113_032733",
+    "artifact_id": "stds_kernel_ridge_rbf_stds_synth_20261113_041319",
     "semantic_version": "0.1.0",
     "schema_version": "1.0.0",
     "instrument_profile_id": "visnir_24ch_v1",
@@ -17,7 +17,7 @@
       "torch": "2.7.1",
       "safetensors": "0.5.3"
     },
-    "artifact_sha256": "cb15da6acd0eea65805bb4171495bc05e683f1313e2dab43f9d2efd9fed21fa0",
+    "artifact_sha256": "979857576374fc1400694dc7112384c1911c103366b85be109ef810e78fb263d",
     "code_commit": "uncommitted",
     "seed": 42,
     "created_utc": "2026-11-12T00:00:00Z"
@@ -114,7 +114,8 @@
     "has_organic_band": true,
     "has_carbonate_bands": true,
     "calibration_file_id": "default_cal_v1",
-    "description": "24-channel targeted Vis-SWIR array covering O-H, C-H, Al-OH, and CO3 bands"
+    "description": "24-channel targeted Vis-SWIR array covering O-H, C-H, Al-OH, and CO3 bands",
+    "metadata": {}
   },
   "target_schema": {
     "targets": [
@@ -579,13 +580,13 @@
       "size_bytes": 73920
     },
     "preprocess_state.npz": {
-      "sha256": "e1787692b905c28d9960fd4f2621e37c4cd9c12f5bd28040c8a6687a1de86f8e",
+      "sha256": "9466e53d7064d15a4cc78ef89a94e7c13fd1d7d22ce81c6a2bbbc725e656dddd",
       "size_bytes": 66358
     },
     "model_card.json": {
-      "sha256": "11bebdab4e1c1ad91795d5096925c8468bef08f9ac5df15a05e4bc286ab6e6f3",
+      "sha256": "8f74a1ab17cfe78d89dcaf4d0c0b4548659788b870b6555d2ce037746d747147",
       "size_bytes": 11956
     }
   },
-  "bundle_sha256": "cb15da6acd0eea65805bb4171495bc05e683f1313e2dab43f9d2efd9fed21fa0"
+  "bundle_sha256": "979857576374fc1400694dc7112384c1911c103366b85be109ef810e78fb263d"
 }

@@ -22,7 +22,7 @@ from st_ds.artifact.bundle import collect_dependency_versions, inspect_artifact,
 from st_ds.chemometrics.pipeline import ChemometricPipeline, PreprocessConfig
 from st_ds.config import get_runtime_config, resolve_lang
 from st_ds.domain.errors import ReportSerializationError, STDSError, SchemaError
-from st_ds.domain.instrument import get_builtin_profile
+from st_ds.domain.instrument import get_builtin_profile, resolve_instrument_profile
 from st_ds.domain.schemas import ArtifactMetadata, Measurement
 from st_ds.features.fusion import FeatureFusionConfig, FeatureFusionPipeline
 from st_ds.io.dataset import (
@@ -57,18 +57,31 @@ MODEL_CLI_ALIASES: dict[str, str] = {
 }
 
 
-def _load_dataset_auto(path: str | Path, *, profile_id: str | None = None) -> SoilDataset:
+def _load_dataset_auto(
+    path: str | Path,
+    *,
+    profile_id: str | None = None,
+    target_columns: Sequence[str] | None = None,
+) -> SoilDataset:
     p = Path(path)
     if not p.exists():
         raise SchemaError(f"Input dataset file not found: '{p}'.")
-    prof = get_builtin_profile(profile_id) if profile_id else None
+    prof = resolve_instrument_profile(profile_id) if profile_id else None
     suffix = p.suffix.lower()
     if suffix == ".csv":
-        return load_dataset_csv(p, profile=prof)
-    return load_dataset_json(p)
+        return load_dataset_csv(p, profile=prof, target_columns=target_columns)
+    ds = load_dataset_json(p)
+    if prof is not None and ds.instrument_profile is None:
+        ds.instrument_profile = prof
+    return ds
 
 
-def _load_measurements_for_predict(path: str | Path, *, profile_id: str | None = None) -> tuple[list[Measurement], bool]:
+def _load_measurements_for_predict(
+    path: str | Path,
+    *,
+    profile_id: str | None = None,
+    fallback_profile: Any = None,
+) -> tuple[list[Measurement], bool]:
     """Load either a SoilDataset (JSON/CSV) or a single Measurement JSON dict.
 
     Returns ``(measurements, is_single_record)``.
@@ -77,7 +90,8 @@ def _load_measurements_for_predict(path: str | Path, *, profile_id: str | None =
     if not p.exists():
         raise SchemaError(f"Input prediction file not found: '{p}'.")
     if p.suffix.lower() == ".csv":
-        ds = _load_dataset_auto(p, profile_id=profile_id)
+        prof = resolve_instrument_profile(profile_id) if profile_id else fallback_profile
+        ds = load_dataset_csv(p, profile=prof)
         return ds.records, False
 
     raw = json.loads(p.read_text(encoding="utf-8"))
@@ -101,16 +115,23 @@ def _emit_json(payload: dict[str, Any], output_path: str | None = None) -> None:
 
 
 def _cmd_dataset_validate(args: argparse.Namespace) -> int:
-    ds = _load_dataset_auto(args.input, profile_id=args.instrument_profile)
+    target_name = getattr(args, "target", "soc_pct")
+    ds = _load_dataset_auto(
+        args.input,
+        profile_id=args.instrument_profile,
+        target_columns=[target_name],
+    )
     summary = DataValidator.validate_dataset(
         ds,
         for_training=bool(args.for_training),
         require_sic=not bool(args.no_require_sic),
+        target_name=target_name,
     )
     payload = {
         "command": "dataset validate",
         "dataset_id": ds.dataset_id,
         "dataset_source": ds.dataset_source,
+        "target": target_name,
         "is_valid": summary.is_valid,
         "n_records": summary.n_records,
         "n_errors": summary.n_errors,
@@ -122,8 +143,9 @@ def _cmd_dataset_validate(args: argparse.Namespace) -> int:
 
 
 def _cmd_calibration_fit_epo(args: argparse.Namespace) -> int:
-    wet_ds = _load_dataset_auto(args.wet)
-    dry_ds = _load_dataset_auto(args.dry)
+    prof_arg = getattr(args, "instrument_profile", None)
+    wet_ds = _load_dataset_auto(args.wet, profile_id=prof_arg)
+    dry_ds = _load_dataset_auto(args.dry, profile_id=prof_arg)
     cfg = PreprocessConfig(
         use_absorbance=not bool(args.no_absorbance),
         use_snv=not bool(args.no_snv),
@@ -166,14 +188,27 @@ def _cmd_calibration_fit_epo(args: argparse.Namespace) -> int:
     return 0
 
 
+def _parse_covariates_arg(raw: str | None) -> tuple[str, ...] | None:
+    if raw is None:
+        return None
+    cleaned = raw.strip()
+    if cleaned.lower() in ("none", "off", "-"):
+        return ()
+    return tuple(c.strip() for c in cleaned.split(",") if c.strip())
+
+
 def _cmd_train(args: argparse.Namespace) -> int:
-    ds = _load_dataset_auto(args.input)
-    wet_ds = _load_dataset_auto(args.wet) if getattr(args, "wet", None) else None
-    dry_ds = _load_dataset_auto(args.dry) if getattr(args, "dry", None) else None
+    prof_arg = getattr(args, "instrument_profile", None)
+    ds = _load_dataset_auto(args.input, profile_id=prof_arg, target_columns=[args.target])
+    wet_ds = _load_dataset_auto(args.wet, profile_id=prof_arg) if getattr(args, "wet", None) else None
+    dry_ds = _load_dataset_auto(args.dry, profile_id=prof_arg) if getattr(args, "dry", None) else None
     pre_cfg = PreprocessConfig(suppression_mode=args.suppression_mode, epo_q=args.epo_q)
+    cov_names = _parse_covariates_arg(getattr(args, "covariates", None))
+    fusion_cfg = FeatureFusionConfig(covariate_names=cov_names) if cov_names is not None else FeatureFusionConfig()
     trainer_cfg = TrainerConfig(
         target_name=args.target,
         preprocess_config=pre_cfg,
+        fusion_config=fusion_cfg,
         hybrid_epochs=args.hybrid_epochs,
         seed=args.seed,
     )
@@ -219,7 +254,11 @@ def _cmd_train(args: argparse.Namespace) -> int:
         external_wet=wet_ds,
         external_dry=dry_ds,
     )
-    fusion = FeatureFusionPipeline(trainer_cfg.fusion_config).fit(ds.records, chemometric_pipeline=chemo)
+    fusion = FeatureFusionPipeline(trainer_cfg.fusion_config).fit(
+        ds.records,
+        chemometric_pipeline=chemo,
+        profile=ds.instrument_profile,
+    )
     fused = fusion.build_feature_vector(ds.records, chemometric_pipeline=chemo)
 
     y_all = _extract_target_vector(ds.records, args.target)
@@ -249,7 +288,7 @@ def _cmd_train(args: argparse.Namespace) -> int:
         dataset_source=ds.dataset_source,
     )
     tr_groups = np.asarray([r.site_id for r in ds.records], dtype=str)
-    if isinstance(final_model, STSoilHybridNetRegressor):
+    if isinstance(final_model, STSoilHybridNetRegressor) and args.target in all_carbon_targets:
         soc_vals = (
             _extract_target_vector(ds.records, "soc_pct")
             if "soc_pct" in final_target_names
@@ -288,7 +327,7 @@ def _cmd_train(args: argparse.Namespace) -> int:
 
     ood = OutOfDomainDetector(OODConfig()).fit(fused.X_fused, measurements=ds.records)
     profile = ds.records[0].spectrum
-    inst_prof = fusion.instrument_profile or get_builtin_profile(ds.records[0].instrument_profile_id)
+    inst_prof = fusion.instrument_profile or resolve_instrument_profile(prof_arg or ds.records[0].instrument_profile_id)
     del profile
 
     meta = ArtifactMetadata(
@@ -327,6 +366,7 @@ def _cmd_train(args: argparse.Namespace) -> int:
         "command": "train",
         "artifact_dir": str(out_dir),
         "selected_model": chosen_key,
+        "target": args.target,
         "target_names": list(final_target_names),
         "suppression_mode": pre_cfg.suppression_mode,
         "multi_target": len(final_target_names) > 1,
@@ -345,11 +385,14 @@ def _cmd_train(args: argparse.Namespace) -> int:
 
 
 def _cmd_evaluate(args: argparse.Namespace) -> int:
-    ds = _load_dataset_auto(args.input)
-    wet_ds = _load_dataset_auto(args.wet) if getattr(args, "wet", None) else None
-    dry_ds = _load_dataset_auto(args.dry) if getattr(args, "dry", None) else None
+    prof_arg = getattr(args, "instrument_profile", None)
+    ds = _load_dataset_auto(args.input, profile_id=prof_arg, target_columns=[args.target])
+    wet_ds = _load_dataset_auto(args.wet, profile_id=prof_arg) if getattr(args, "wet", None) else None
+    dry_ds = _load_dataset_auto(args.dry, profile_id=prof_arg) if getattr(args, "dry", None) else None
     pre_cfg = PreprocessConfig(suppression_mode=getattr(args, "suppression_mode", "none"), epo_q=getattr(args, "epo_q", None))
-    cfg = TrainerConfig(target_name=args.target, preprocess_config=pre_cfg, seed=args.seed)
+    cov_names = _parse_covariates_arg(getattr(args, "covariates", None))
+    fusion_cfg = FeatureFusionConfig(covariate_names=cov_names) if cov_names is not None else FeatureFusionConfig()
+    cfg = TrainerConfig(target_name=args.target, preprocess_config=pre_cfg, fusion_config=fusion_cfg, seed=args.seed)
     trainer = STSoilTrainer(cfg)
     n_sites = len(ds.unique_site_ids)
     folds = GroupedSplitBuilder.group_kfold_split(
@@ -379,7 +422,8 @@ def _cmd_predict(args: argparse.Namespace) -> int:
     analyzer = STSoilAnalyzer.from_artifact(args.artifact)
     measurements, is_single = _load_measurements_for_predict(
         args.input,
-        profile_id=analyzer.artifact.instrument_profile.profile_id,
+        profile_id=getattr(args, "instrument_profile", None),
+        fallback_profile=analyzer.artifact.instrument_profile,
     )
     if is_single:
         report = analyzer.predict(
@@ -465,7 +509,7 @@ def _cmd_report_export(args: argparse.Namespace) -> int:
 
 def _cmd_visualize(args: argparse.Namespace) -> int:
     profile_id = getattr(args, "instrument_profile", None)
-    ds = _load_dataset_auto(args.input, profile_id=profile_id)
+    ds = _load_dataset_auto(args.input, profile_id=profile_id, target_columns=[args.target])
     wet_ds = _load_dataset_auto(args.wet, profile_id=profile_id) if args.wet else None
     dry_ds = _load_dataset_auto(args.dry, profile_id=profile_id) if args.dry else None
 
@@ -474,8 +518,11 @@ def _cmd_visualize(args: argparse.Namespace) -> int:
     include_pdf = runtime_cfg.pdf_export and (not bool(getattr(args, "no_pdf", False)))
 
     formats = tuple(fmt.strip() for fmt in str(args.format).split(",") if fmt.strip())
+    cov_names = _parse_covariates_arg(getattr(args, "covariates", None))
     cfg = VisualizationConfig(
         target_name=args.target,
+        model_name=getattr(args, "model", "auto"),
+        covariate_names=cov_names,
         n_folds=int(args.folds),
         formats=formats,
         dpi=dpi_val,
@@ -533,9 +580,10 @@ def build_parser() -> argparse.ArgumentParser:
     p_ds_sub = p_ds.add_subparsers(dest="action", required=True)
     p_val = p_ds_sub.add_parser("validate", help="Validate dataset schema, units, and lineage.")
     p_val.add_argument("--input", required=True, help="Path to dataset JSON or CSV.")
-    p_val.add_argument("--instrument-profile", default=None, help="Optional builtin profile ID for CSV loading.")
+    p_val.add_argument("--instrument-profile", default=None, help="Optional builtin profile ID or JSON path for CSV loading.")
     p_val.add_argument("--for-training", action="store_true", help="Require SoilReference target labels.")
     p_val.add_argument("--no-require-sic", action="store_true", help="Allow missing SIC in targets.")
+    p_val.add_argument("--target", default="soc_pct", help="Target column/field name to verify during training validation.")
     p_val.add_argument("--output", default=None, help="Optional JSON output file.")
     p_val.set_defaults(func=_cmd_dataset_validate)
 
@@ -545,6 +593,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_epo = p_cal_sub.add_parser("fit-epo", help="Fit External Parameter Orthogonalization from wet/dry pairs.")
     p_epo.add_argument("--wet", required=True, help="Path to paired wet SoilDataset.")
     p_epo.add_argument("--dry", required=True, help="Path to paired dry SoilDataset.")
+    p_epo.add_argument("--instrument-profile", default=None, help="Optional builtin profile ID or JSON path for raw CSV pairs.")
     p_epo.add_argument("--output", required=True, help="Output directory or .json file.")
     p_epo.add_argument("--q", type=int, default=None, help="Optional fixed EPO rank q.")
     p_epo.add_argument("--no-absorbance", action="store_true")
@@ -562,7 +611,9 @@ def build_parser() -> argparse.ArgumentParser:
         choices=["auto", *sorted(set(MODEL_CLI_ALIASES.keys()))],
         help="Model family or 'auto' to pick best OOF RMSE.",
     )
-    p_train.add_argument("--target", default="soc_pct", choices=["soc_pct", "sic_pct", "tc_pct"])
+    p_train.add_argument("--target", default="soc_pct", help="Target label/column name (default: soc_pct; also sic_pct, tc_pct, or custom CSV/JSON target).")
+    p_train.add_argument("--instrument-profile", default=None, help="Optional builtin profile ID or JSON path for raw CSV inputs.")
+    p_train.add_argument("--covariates", default=None, help="Comma-separated covariate columns or 'none' (default: ph,moisture_volumetric_pct,temperature_c,ec_ds_m).")
     p_train.add_argument("--folds", type=int, default=3)
     p_train.add_argument("--seed", type=int, default=42)
     p_train.add_argument("--suppression-mode", default="none", choices=["none", "epo", "glsw"])
@@ -580,7 +631,9 @@ def build_parser() -> argparse.ArgumentParser:
     # evaluate
     p_eval = sub.add_parser("evaluate", help="Run grouped CV benchmark across candidate models.")
     p_eval.add_argument("--input", required=True, help="SoilDataset JSON or CSV.")
-    p_eval.add_argument("--target", default="soc_pct", choices=["soc_pct", "sic_pct", "tc_pct"])
+    p_eval.add_argument("--target", default="soc_pct", help="Target label/column name (default: soc_pct; also sic_pct, tc_pct, or custom target).")
+    p_eval.add_argument("--instrument-profile", default=None, help="Optional builtin profile ID or JSON path for raw CSV inputs.")
+    p_eval.add_argument("--covariates", default=None, help="Comma-separated covariate columns or 'none'.")
     p_eval.add_argument("--folds", type=int, default=3)
     p_eval.add_argument("--seed", type=int, default=42)
     p_eval.add_argument("--suppression-mode", default="none", choices=["none", "epo", "glsw"])
@@ -603,6 +656,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_pred = sub.add_parser("predict", help="Run inference from a verified artifact bundle.")
     p_pred.add_argument("--artifact", required=True, help="Artifact bundle directory.")
     p_pred.add_argument("--input", required=True, help="Measurement or SoilDataset JSON/CSV path.")
+    p_pred.add_argument("--instrument-profile", default=None, help="Optional builtin profile ID or JSON path for raw CSV inputs.")
     p_pred.add_argument("--output", default=None, help="Optional PredictionReport JSON output path.")
     p_pred.add_argument("--include-xai", action="store_true", help="Include XAI sensitivity/IG/HSIC reports.")
     p_pred.add_argument("--no-stock", action="store_true", help="Disable carbon stock computation.")
@@ -630,10 +684,17 @@ def build_parser() -> argparse.ArgumentParser:
     p_viz.add_argument("--input", required=True, help="Input SoilDataset JSON/CSV path.")
     p_viz.add_argument("--output", required=True, help="Output directory for plots/, tables/, interactive/, reports/, and index.html.")
     p_viz.add_argument("--artifact", default=None, help="Optional saved artifact bundle directory (trains in-memory if omitted).")
-    p_viz.add_argument("--instrument-profile", default=None, help="Optional builtin profile ID for raw CSV inputs without .meta.json.")
+    p_viz.add_argument("--instrument-profile", default=None, help="Optional builtin profile ID or JSON path for raw CSV inputs.")
     p_viz.add_argument("--wet", default=None, help="Optional paired wet SoilDataset JSON/CSV for EPO comparison plot.")
     p_viz.add_argument("--dry", default=None, help="Optional paired dry SoilDataset JSON/CSV for EPO comparison plot.")
-    p_viz.add_argument("--target", default="soc_pct", choices=["soc_pct", "sic_pct", "tc_pct"], help="Target carbon fraction.")
+    p_viz.add_argument("--target", default="soc_pct", help="Target label/column name (default: soc_pct; also sic_pct, tc_pct, or custom target).")
+    p_viz.add_argument(
+        "--model",
+        default="auto",
+        choices=["auto", *sorted(set(MODEL_CLI_ALIASES.keys()))],
+        help="Model family to highlight/train in-memory when --artifact is omitted (default: auto).",
+    )
+    p_viz.add_argument("--covariates", default=None, help="Comma-separated covariate columns or 'none' (defaults to artifact config or standard covariates).")
     p_viz.add_argument("--folds", type=int, default=4, help="Grouped K-Fold splits for benchmark comparison plots.")
     p_viz.add_argument("--format", default="png", help="Comma-separated figure formats (e.g., png or png,svg).")
     p_viz.add_argument("--dpi", type=int, default=None, help="Raster DPI resolution (defaults to .env STDS_DPI or 160).")

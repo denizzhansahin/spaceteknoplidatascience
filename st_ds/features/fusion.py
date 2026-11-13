@@ -378,12 +378,14 @@ class FeatureFusionPipeline:
         profile: InstrumentProfile | None = None,
     ) -> FeatureFusionPipeline:
         """Fit imputers and separate spectral/covariate scalers on training records only."""
-        recs = measurements.records if isinstance(measurements, SoilDataset) else list(measurements)
+        is_ds = isinstance(measurements, SoilDataset)
+        recs = measurements.records if is_ds else list(measurements)
         if len(recs) == 0:
             raise SchemaError("FeatureFusionPipeline.fit requires at least 1 measurement.")
 
         prof_id = recs[0].instrument_profile_id
-        self.instrument_profile = profile or get_builtin_profile(prof_id)
+        resolved_profile = profile or (measurements.instrument_profile if is_ds else None)
+        self.instrument_profile = resolved_profile or get_builtin_profile(prof_id)
         for r in recs:
             r.spectrum.validate_against_profile(self.instrument_profile)
 

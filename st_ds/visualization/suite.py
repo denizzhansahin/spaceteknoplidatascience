@@ -115,12 +115,18 @@ def _run_benchmark_if_feasible(
         and len(wet_dataset.records) > 0
         and len(dry_dataset.records) > 0
     )
+    fusion_cfg = (
+        FeatureFusionConfig(covariate_names=config.covariate_names)
+        if config.covariate_names is not None
+        else FeatureFusionConfig()
+    )
     t_cfg = TrainerConfig(
         target_name=config.target_name,
         preprocess_config=PreprocessConfig(
             suppression_mode="epo" if has_epo_pairs else "none",
             epo_q=2,
         ),
+        fusion_config=fusion_cfg,
         hybrid_epochs=25,
         seed=config.seed,
     )
@@ -151,9 +157,15 @@ def _build_in_memory_analyzer(
     pre_cfg = PreprocessConfig(
         suppression_mode="epo" if (wet_dataset is not None and dry_dataset is not None) else "none"
     )
+    fusion_cfg = (
+        FeatureFusionConfig(covariate_names=config.covariate_names)
+        if config.covariate_names is not None
+        else FeatureFusionConfig()
+    )
     t_cfg = TrainerConfig(
         target_name=config.target_name,
         preprocess_config=pre_cfg,
+        fusion_config=fusion_cfg,
         hybrid_epochs=25,
         seed=config.seed,
     )
@@ -161,7 +173,11 @@ def _build_in_memory_analyzer(
         chemo = ChemometricPipeline(pre_cfg).fit_from_datasets(wet_dataset, dry_dataset)
     else:
         chemo = _fit_fold_chemometrics(t_cfg, dataset.records)
-    fusion = FeatureFusionPipeline(t_cfg.fusion_config).fit(dataset.records, chemometric_pipeline=chemo)
+    fusion = FeatureFusionPipeline(t_cfg.fusion_config).fit(
+        dataset.records,
+        chemometric_pipeline=chemo,
+        profile=dataset.instrument_profile,
+    )
     fused = fusion.build_feature_vector(dataset.records, chemometric_pipeline=chemo)
     y_all = _extract_target_vector(dataset.records, config.target_name)
     has_multitarget = (
@@ -178,7 +194,22 @@ def _build_in_memory_analyzer(
 
     trainer = STSoilTrainer(t_cfg)
     factories = trainer.default_model_factories(include_optional=True)
-    chosen_key = benchmark.evidence_ranking[0] if (benchmark is not None and benchmark.evidence_ranking) else "plsr"
+    alias_map = {
+        "auto": "auto",
+        "plsr": "plsr",
+        "kernel_ridge": "kernel_ridge_rbf",
+        "kernel_ridge_rbf": "kernel_ridge_rbf",
+        "random_forest": "random_forest",
+        "local_plsr": "local_plsr_mbl",
+        "local_plsr_mbl": "local_plsr_mbl",
+        "hybrid_net": "st_soil_hybrid_net",
+        "st_soil_hybrid_net": "st_soil_hybrid_net",
+    }
+    requested_key = alias_map.get(config.model_name, config.model_name)
+    if requested_key != "auto" and requested_key in factories:
+        chosen_key = requested_key
+    else:
+        chosen_key = benchmark.evidence_ranking[0] if (benchmark is not None and benchmark.evidence_ranking) else "plsr"
     if chosen_key not in factories:
         chosen_key = "plsr"
 
@@ -236,7 +267,7 @@ def _build_in_memory_analyzer(
         )
 
     ood = OutOfDomainDetector(OODConfig()).fit(fused.X_fused, measurements=dataset.records)
-    inst_prof = fusion.instrument_profile or get_builtin_profile(dataset.records[0].instrument_profile_id)
+    inst_prof = fusion.instrument_profile or dataset.instrument_profile or get_builtin_profile(dataset.records[0].instrument_profile_id)
     meta = ArtifactMetadata(
         artifact_id=f"stds_viz_{chosen_key}_{dataset.dataset_id}",
         semantic_version=__version__,
@@ -279,21 +310,39 @@ def _extract_predictions_from_batch(
         y_true = arrays.sic.copy()
     elif target_name == "tc_pct":
         y_true = arrays.tc.copy()
-    else:
+    elif target_name == "soc_pct":
         y_true = arrays.soc.copy()
+    else:
+        y_true = np.array(
+            [
+                float(v)
+                if (r.reference is not None and (v := r.reference.get_target(target_name)) is not None)
+                else np.nan
+                for r in arrays.records
+            ],
+            dtype=np.float64,
+        )
 
     y_pred = np.full(n, np.nan, dtype=float)
     pred_std = np.full(n, np.nan, dtype=float)
     ci_lo = np.full(n, np.nan, dtype=float)
     ci_hi = np.full(n, np.nan, dtype=float)
 
-    std_key = f"{target_name.replace('_pct', '')}_std_pct"
+    std_key = (
+        f"{target_name.replace('_pct', '')}_std_pct"
+        if target_name in ("soc_pct", "sic_pct", "tc_pct")
+        else f"{target_name}_std"
+    )
     for i, rep in enumerate(batch.results):
         if rep is None:
             continue
         cm = rep.carbon_metrics
         val = cm.get(target_name) if cm.get(target_name) is not None else cm.get("soc_pct")
-        sd = cm.get(std_key) if cm.get(std_key) is not None else cm.get("soc_std_pct")
+        sd = (
+            cm.get(std_key)
+            if cm.get(std_key) is not None
+            else (cm.get(f"{target_name}_std") if cm.get(f"{target_name}_std") is not None else cm.get("soc_std_pct"))
+        )
         ci = cm.get("confidence_interval") or {}
         if val is not None:
             y_pred[i] = float(val)
@@ -330,25 +379,53 @@ def generate_full_visualization_suite(
 
     arrays: DatasetArrays = extract_dataset_arrays(dataset)
 
+    if analyzer is None and artifact_path is not None:
+        analyzer = STSoilAnalyzer.from_artifact(artifact_path)
+
+    eff_covariates = cfg.covariate_names
+    if eff_covariates is None and analyzer is not None:
+        eff_covariates = analyzer._artifact.fusion_pipeline.config.covariate_names
+
+    # Ensure benchmark is run including requested optional model when needed
+    eff_cfg = cfg
+    if (
+        cfg.model_name not in ("auto", "plsr", "kernel_ridge", "kernel_ridge_rbf") and not cfg.include_optional_models
+    ) or (eff_covariates is not cfg.covariate_names):
+        eff_cfg = VisualizationConfig(
+            target_name=cfg.target_name,
+            model_name=cfg.model_name,
+            covariate_names=eff_covariates,
+            n_folds=cfg.n_folds,
+            formats=cfg.formats,
+            dpi=cfg.dpi,
+            include_html_dashboard=cfg.include_html_dashboard,
+            include_interactive_3d=cfg.include_interactive_3d,
+            include_optional_models=(
+                cfg.include_optional_models
+                or cfg.model_name not in ("auto", "plsr", "kernel_ridge", "kernel_ridge_rbf")
+            ),
+            include_pdf_report=cfg.include_pdf_report,
+            lang=cfg.lang,
+            seed=cfg.seed,
+            max_spectra_overlay=cfg.max_spectra_overlay,
+        )
+
     if benchmark is None:
         benchmark = _run_benchmark_if_feasible(
-        dataset,
-        config=cfg,
-        wet_dataset=wet_dataset,
-        dry_dataset=dry_dataset,
-    )
+            dataset,
+            config=eff_cfg,
+            wet_dataset=wet_dataset,
+            dry_dataset=dry_dataset,
+        )
 
     if analyzer is None:
-        if artifact_path is not None:
-            analyzer = STSoilAnalyzer.from_artifact(artifact_path)
-        else:
-            analyzer = _build_in_memory_analyzer(
-                dataset,
-                benchmark=benchmark,
-                config=cfg,
-                wet_dataset=wet_dataset,
-                dry_dataset=dry_dataset,
-            )
+        analyzer = _build_in_memory_analyzer(
+            dataset,
+            benchmark=benchmark,
+            config=eff_cfg,
+            wet_dataset=wet_dataset,
+            dry_dataset=dry_dataset,
+        )
 
     loaded = analyzer._artifact
     fused = loaded.fusion_pipeline.build_feature_vector(
@@ -376,11 +453,12 @@ def generate_full_visualization_suite(
     )
 
     # Prefer OOF predictions for parity / conformal calibration curves if available and aligned
-    best_entry = (
-        benchmark.entries[benchmark.evidence_ranking[0]]
-        if (benchmark is not None and benchmark.evidence_ranking)
-        else None
-    )
+    active_model_name = loaded.model.model_name
+    best_entry = None
+    if benchmark is not None and active_model_name in benchmark.entries:
+        best_entry = benchmark.entries[active_model_name]
+    elif benchmark is not None and benchmark.evidence_ranking:
+        best_entry = benchmark.entries[benchmark.evidence_ranking[0]]
     if (
         best_entry is not None
         and best_entry.oof_predictions.size == len(dataset.records)

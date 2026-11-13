@@ -1,0 +1,578 @@
+{
+  "artifact_format_version": "1.0.0",
+  "schema_version": "1.0.0",
+  "metadata": {
+    "artifact_id": "stds_plsr_stds_synth_20261113_041532",
+    "semantic_version": "0.1.0",
+    "schema_version": "1.0.0",
+    "instrument_profile_id": "visnir_24ch_v1",
+    "calibration_id": "cal_synth_v2",
+    "pipeline_version": "chem_v1",
+    "dataset_hash": "a7ed9146f7ead0aad6a9c3eb08defffe10929334672c74d0d6e915f834f70bfe",
+    "dependency_versions": {
+      "python": "3.13.9",
+      "numpy": "2.2.6",
+      "scipy": "1.17.0",
+      "sklearn": "1.6.1",
+      "torch": "2.7.1",
+      "safetensors": "0.5.3"
+    },
+    "artifact_sha256": "1f5962ce22615de7b470fc44d94b685538717eba63c26c00eecea9f620a8d44d",
+    "code_commit": "uncommitted",
+    "seed": 42,
+    "created_utc": "2026-11-12T00:00:00Z"
+  },
+  "instrument_profile": {
+    "profile_id": "visnir_24ch_v1",
+    "sensor_model": "STDS-InGaAs-24Ch",
+    "modality": "vis_nir_swir",
+    "n_channels": 24,
+    "wavelength_grid_nm": [
+      450.0,
+      550.0,
+      650.0,
+      750.0,
+      850.0,
+      950.0,
+      1050.0,
+      1200.0,
+      1350.0,
+      1415.0,
+      1445.0,
+      1600.0,
+      1720.0,
+      1850.0,
+      1915.0,
+      1945.0,
+      2050.0,
+      2145.0,
+      2175.0,
+      2205.0,
+      2260.0,
+      2320.0,
+      2340.0,
+      2520.0
+    ],
+    "channel_ids": [
+      "CH_01_450nm",
+      "CH_02_550nm",
+      "CH_03_650nm",
+      "CH_04_750nm",
+      "CH_05_850nm",
+      "CH_06_950nm",
+      "CH_07_1050nm",
+      "CH_08_1200nm",
+      "CH_09_1350nm",
+      "CH_10_1415nm",
+      "CH_11_1445nm",
+      "CH_12_1600nm",
+      "CH_13_1720nm",
+      "CH_14_1850nm",
+      "CH_15_1915nm",
+      "CH_16_1945nm",
+      "CH_17_2050nm",
+      "CH_18_2145nm",
+      "CH_19_2175nm",
+      "CH_20_2205nm",
+      "CH_21_2260nm",
+      "CH_22_2320nm",
+      "CH_23_2340nm",
+      "CH_24_2520nm"
+    ],
+    "fwhm_nm": [
+      15.0,
+      15.0,
+      15.0,
+      15.0,
+      15.0,
+      15.0,
+      15.0,
+      15.0,
+      15.0,
+      15.0,
+      15.0,
+      15.0,
+      15.0,
+      15.0,
+      15.0,
+      15.0,
+      15.0,
+      15.0,
+      15.0,
+      15.0,
+      15.0,
+      15.0,
+      15.0,
+      15.0
+    ],
+    "spectral_range_nm": [
+      450.0,
+      2520.0
+    ],
+    "is_uniform_grid": false,
+    "has_water_bands": true,
+    "has_organic_band": true,
+    "has_carbonate_bands": true,
+    "calibration_file_id": "default_cal_v1",
+    "description": "24-channel targeted Vis-SWIR array covering O-H, C-H, Al-OH, and CO3 bands",
+    "metadata": {}
+  },
+  "target_schema": {
+    "targets": [
+      "soc_pct",
+      "sic_pct",
+      "tc_pct"
+    ],
+    "carbon_unit": "pct",
+    "dry_matter_basis": true,
+    "enforce_non_negative": true,
+    "enforce_tc_closure": true,
+    "closure_tolerance_pct": 0.05,
+    "taxonomy_version": "provisional_taxonomy_v0",
+    "class_labels": [
+      "low_organic_low_carbonate",
+      "low_organic_calcareous",
+      "humus_rich_non_calcareous",
+      "humus_rich_calcareous"
+    ]
+  },
+  "model_spec": {
+    "class_name": "PLSRRegressor",
+    "model_name": "plsr",
+    "model_family": "linear_latent_chemometric",
+    "is_1d_target": false,
+    "n_features_in": 32,
+    "n_targets": 3,
+    "target_names": [
+      "tc_pct",
+      "soc_pct",
+      "sic_pct"
+    ],
+    "clip_negative": true,
+    "min_std": 0.0001,
+    "feature_names": [
+      "spec_CH_01_450nm",
+      "spec_CH_02_550nm",
+      "spec_CH_03_650nm",
+      "spec_CH_04_750nm",
+      "spec_CH_05_850nm",
+      "spec_CH_06_950nm",
+      "spec_CH_07_1050nm",
+      "spec_CH_08_1200nm",
+      "spec_CH_09_1350nm",
+      "spec_CH_10_1415nm",
+      "spec_CH_11_1445nm",
+      "spec_CH_12_1600nm",
+      "spec_CH_13_1720nm",
+      "spec_CH_14_1850nm",
+      "spec_CH_15_1915nm",
+      "spec_CH_16_1945nm",
+      "spec_CH_17_2050nm",
+      "spec_CH_18_2145nm",
+      "spec_CH_19_2175nm",
+      "spec_CH_20_2205nm",
+      "spec_CH_21_2260nm",
+      "spec_CH_22_2320nm",
+      "spec_CH_23_2340nm",
+      "spec_CH_24_2520nm",
+      "ph",
+      "moisture_volumetric_pct",
+      "temperature_c",
+      "ec_ds_m",
+      "is_missing_ph",
+      "is_missing_moisture_volumetric_pct",
+      "is_missing_temperature_c",
+      "is_missing_ec_ds_m"
+    ],
+    "training_dataset_source": "synthetic",
+    "params": {
+      "model_name": "plsr",
+      "model_family": "linear_latent_chemometric",
+      "target_names": [
+        "tc_pct",
+        "soc_pct",
+        "sic_pct"
+      ],
+      "clip_negative": true,
+      "min_std": 0.0001,
+      "max_components": 10,
+      "inner_cv_folds": 5,
+      "scale": true,
+      "selected_n_components": 7
+    },
+    "selected_n_components": 7,
+    "weight_format": "safetensors_numpy"
+  },
+  "weight_filename": "model_weights.safetensors",
+  "preprocess_spec": {
+    "chemometrics": {
+      "pipeline_version": "chem_v1",
+      "use_absorbance": true,
+      "use_snv": true,
+      "use_savgol": true,
+      "sg_window": 7,
+      "sg_polyorder": 2,
+      "sg_deriv": 1,
+      "suppression_mode": "epo",
+      "epo_q": 2,
+      "epo_max_q": 6,
+      "glsw_alpha": 0.1
+    },
+    "space_signature": "chem_v1:3e4515d175130722",
+    "wavelength_grid_nm": [
+      450.0,
+      550.0,
+      650.0,
+      750.0,
+      850.0,
+      950.0,
+      1050.0,
+      1200.0,
+      1350.0,
+      1415.0,
+      1445.0,
+      1600.0,
+      1720.0,
+      1850.0,
+      1915.0,
+      1945.0,
+      2050.0,
+      2145.0,
+      2175.0,
+      2205.0,
+      2260.0,
+      2320.0,
+      2340.0,
+      2520.0
+    ],
+    "epo": {
+      "n_bands": 24,
+      "q": 2,
+      "max_q": 6,
+      "variance_capture_threshold": 0.9,
+      "space_signature": "chem_v1:3e4515d175130722",
+      "calibration_dataset_hash": "untracked"
+    },
+    "glsw": null,
+    "fusion_config": {
+      "covariate_names": [
+        "ph",
+        "moisture_volumetric_pct",
+        "temperature_c",
+        "ec_ds_m"
+      ],
+      "missing_strategy": "median_with_indicator",
+      "spectral_scaler": "standard",
+      "covariate_scaler": "robust",
+      "include_eis": false,
+      "include_derived": false,
+      "include_visnir_bands": false,
+      "eis_frequencies_hz": [],
+      "eis_protocol_id": null
+    },
+    "feature_profile": {
+      "profile_id": "feat_visnir_24ch_v1",
+      "instrument_profile_id": "visnir_24ch_v1",
+      "descriptors": [
+        {
+          "name": "spec_CH_01_450nm",
+          "group": "spectral",
+          "unit": "preprocessed_signal",
+          "description": "Spectral channel CH_01_450nm centered at 450.00 nm",
+          "required": false
+        },
+        {
+          "name": "spec_CH_02_550nm",
+          "group": "spectral",
+          "unit": "preprocessed_signal",
+          "description": "Spectral channel CH_02_550nm centered at 550.00 nm",
+          "required": false
+        },
+        {
+          "name": "spec_CH_03_650nm",
+          "group": "spectral",
+          "unit": "preprocessed_signal",
+          "description": "Spectral channel CH_03_650nm centered at 650.00 nm",
+          "required": false
+        },
+        {
+          "name": "spec_CH_04_750nm",
+          "group": "spectral",
+          "unit": "preprocessed_signal",
+          "description": "Spectral channel CH_04_750nm centered at 750.00 nm",
+          "required": false
+        },
+        {
+          "name": "spec_CH_05_850nm",
+          "group": "spectral",
+          "unit": "preprocessed_signal",
+          "description": "Spectral channel CH_05_850nm centered at 850.00 nm",
+          "required": false
+        },
+        {
+          "name": "spec_CH_06_950nm",
+          "group": "spectral",
+          "unit": "preprocessed_signal",
+          "description": "Spectral channel CH_06_950nm centered at 950.00 nm",
+          "required": false
+        },
+        {
+          "name": "spec_CH_07_1050nm",
+          "group": "spectral",
+          "unit": "preprocessed_signal",
+          "description": "Spectral channel CH_07_1050nm centered at 1050.00 nm",
+          "required": false
+        },
+        {
+          "name": "spec_CH_08_1200nm",
+          "group": "spectral",
+          "unit": "preprocessed_signal",
+          "description": "Spectral channel CH_08_1200nm centered at 1200.00 nm",
+          "required": false
+        },
+        {
+          "name": "spec_CH_09_1350nm",
+          "group": "spectral",
+          "unit": "preprocessed_signal",
+          "description": "Spectral channel CH_09_1350nm centered at 1350.00 nm",
+          "required": false
+        },
+        {
+          "name": "spec_CH_10_1415nm",
+          "group": "spectral",
+          "unit": "preprocessed_signal",
+          "description": "Spectral channel CH_10_1415nm centered at 1415.00 nm",
+          "required": false
+        },
+        {
+          "name": "spec_CH_11_1445nm",
+          "group": "spectral",
+          "unit": "preprocessed_signal",
+          "description": "Spectral channel CH_11_1445nm centered at 1445.00 nm",
+          "required": false
+        },
+        {
+          "name": "spec_CH_12_1600nm",
+          "group": "spectral",
+          "unit": "preprocessed_signal",
+          "description": "Spectral channel CH_12_1600nm centered at 1600.00 nm",
+          "required": false
+        },
+        {
+          "name": "spec_CH_13_1720nm",
+          "group": "spectral",
+          "unit": "preprocessed_signal",
+          "description": "Spectral channel CH_13_1720nm centered at 1720.00 nm",
+          "required": false
+        },
+        {
+          "name": "spec_CH_14_1850nm",
+          "group": "spectral",
+          "unit": "preprocessed_signal",
+          "description": "Spectral channel CH_14_1850nm centered at 1850.00 nm",
+          "required": false
+        },
+        {
+          "name": "spec_CH_15_1915nm",
+          "group": "spectral",
+          "unit": "preprocessed_signal",
+          "description": "Spectral channel CH_15_1915nm centered at 1915.00 nm",
+          "required": false
+        },
+        {
+          "name": "spec_CH_16_1945nm",
+          "group": "spectral",
+          "unit": "preprocessed_signal",
+          "description": "Spectral channel CH_16_1945nm centered at 1945.00 nm",
+          "required": false
+        },
+        {
+          "name": "spec_CH_17_2050nm",
+          "group": "spectral",
+          "unit": "preprocessed_signal",
+          "description": "Spectral channel CH_17_2050nm centered at 2050.00 nm",
+          "required": false
+        },
+        {
+          "name": "spec_CH_18_2145nm",
+          "group": "spectral",
+          "unit": "preprocessed_signal",
+          "description": "Spectral channel CH_18_2145nm centered at 2145.00 nm",
+          "required": false
+        },
+        {
+          "name": "spec_CH_19_2175nm",
+          "group": "spectral",
+          "unit": "preprocessed_signal",
+          "description": "Spectral channel CH_19_2175nm centered at 2175.00 nm",
+          "required": false
+        },
+        {
+          "name": "spec_CH_20_2205nm",
+          "group": "spectral",
+          "unit": "preprocessed_signal",
+          "description": "Spectral channel CH_20_2205nm centered at 2205.00 nm",
+          "required": false
+        },
+        {
+          "name": "spec_CH_21_2260nm",
+          "group": "spectral",
+          "unit": "preprocessed_signal",
+          "description": "Spectral channel CH_21_2260nm centered at 2260.00 nm",
+          "required": false
+        },
+        {
+          "name": "spec_CH_22_2320nm",
+          "group": "spectral",
+          "unit": "preprocessed_signal",
+          "description": "Spectral channel CH_22_2320nm centered at 2320.00 nm",
+          "required": false
+        },
+        {
+          "name": "spec_CH_23_2340nm",
+          "group": "spectral",
+          "unit": "preprocessed_signal",
+          "description": "Spectral channel CH_23_2340nm centered at 2340.00 nm",
+          "required": false
+        },
+        {
+          "name": "spec_CH_24_2520nm",
+          "group": "spectral",
+          "unit": "preprocessed_signal",
+          "description": "Spectral channel CH_24_2520nm centered at 2520.00 nm",
+          "required": false
+        },
+        {
+          "name": "ph",
+          "group": "covariate",
+          "unit": "dimensionless",
+          "description": "Canonical soil covariate 'ph'",
+          "required": false
+        },
+        {
+          "name": "moisture_volumetric_pct",
+          "group": "covariate",
+          "unit": "pct",
+          "description": "Canonical soil covariate 'moisture_volumetric_pct'",
+          "required": false
+        },
+        {
+          "name": "temperature_c",
+          "group": "covariate",
+          "unit": "degC",
+          "description": "Canonical soil covariate 'temperature_c'",
+          "required": false
+        },
+        {
+          "name": "ec_ds_m",
+          "group": "covariate",
+          "unit": "dS/m",
+          "description": "Canonical soil covariate 'ec_ds_m'",
+          "required": false
+        },
+        {
+          "name": "is_missing_ph",
+          "group": "missing_indicator",
+          "unit": "binary_flag",
+          "description": "Missingness indicator (1.0 if 'ph' was missing or failed QC)",
+          "required": false
+        },
+        {
+          "name": "is_missing_moisture_volumetric_pct",
+          "group": "missing_indicator",
+          "unit": "binary_flag",
+          "description": "Missingness indicator (1.0 if 'moisture_volumetric_pct' was missing or failed QC)",
+          "required": false
+        },
+        {
+          "name": "is_missing_temperature_c",
+          "group": "missing_indicator",
+          "unit": "binary_flag",
+          "description": "Missingness indicator (1.0 if 'temperature_c' was missing or failed QC)",
+          "required": false
+        },
+        {
+          "name": "is_missing_ec_ds_m",
+          "group": "missing_indicator",
+          "unit": "binary_flag",
+          "description": "Missingness indicator (1.0 if 'ec_ds_m' was missing or failed QC)",
+          "required": false
+        }
+      ],
+      "eis_frequencies_hz": [],
+      "eis_protocol_id": null,
+      "schema_hash": "be63504141b74675"
+    },
+    "conformal": {
+      "config": {
+        "method": "normalized",
+        "default_alpha": 0.1,
+        "min_scale": 0.001,
+        "non_negative": true
+      },
+      "n_calibration_samples": 80
+    },
+    "ood": {
+      "config": {
+        "mahalanobis_quantile": 0.99,
+        "knn_k": 5,
+        "knn_quantile": 0.99,
+        "shrinkage": 0.15,
+        "envelope_lower_quantile": 0.0,
+        "envelope_upper_quantile": 1.0,
+        "envelope_margin_fraction": 0.05,
+        "fail_on_ood": false
+      },
+      "cho_lower": true,
+      "mahalanobis_threshold": 6.17885625535795,
+      "knn_threshold": 7.798520833122803,
+      "domain_envelope": {
+        "covariate_bounds": {
+          "ph": [
+            5.627175857622832,
+            7.890726366345921
+          ],
+          "moisture_volumetric_pct": [
+            2.6607838007398774,
+            35.32938311746674
+          ],
+          "temperature_c": [
+            13.489384033953055,
+            28.168455237743924
+          ],
+          "ec_ds_m": [
+            0.31787380295941603,
+            2.0437270037509934
+          ]
+        },
+        "seen_instrument_profiles": [
+          "visnir_24ch_v1"
+        ],
+        "seen_moisture_scenarios": [
+          "dry",
+          "field_moist",
+          "wet"
+        ],
+        "seen_texture_classes": [
+          "clay_loam",
+          "loam"
+        ]
+      }
+    }
+  },
+  "files": {
+    "model_weights.safetensors": {
+      "sha256": "6b54f25b8be6a3508c1a84dce3381a2f8850f2d5a2f24ddc17d1a0123f3939c1",
+      "size_bytes": 1344
+    },
+    "preprocess_state.npz": {
+      "sha256": "cc1e38ea4b85c17909e17c4a9fddbbcb20257dfb4be81e59fe37aeabab306321",
+      "size_bytes": 66358
+    },
+    "model_card.json": {
+      "sha256": "6bb0994678271b448dfe10905a118e721993fd432380a053c97f671e775b69a3",
+      "size_bytes": 11914
+    }
+  },
+  "bundle_sha256": "1f5962ce22615de7b470fc44d94b685538717eba63c26c00eecea9f620a8d44d"
+}

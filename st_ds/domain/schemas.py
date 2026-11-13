@@ -435,6 +435,7 @@ class SoilReference:
     soil_class_id: int | None = None
     soil_class_name: str | None = None
     taxonomy_version: str = "provisional_taxonomy_v0"
+    custom_targets: dict[str, float] = field(default_factory=dict)
 
     @classmethod
     def from_units(
@@ -493,6 +494,30 @@ class SoilReference:
         if self.tc_pct is None and self.soc_pct is not None and self.sic_pct is not None:
             object.__setattr__(self, "tc_pct", float(self.soc_pct + self.sic_pct))
 
+        if self.custom_targets:
+            cleaned: dict[str, float] = {}
+            for k, v in self.custom_targets.items():
+                key = str(k).strip()
+                if not key:
+                    raise SchemaError("SoilReference.custom_targets keys cannot be empty.")
+                try:
+                    fv = float(v)
+                except (TypeError, ValueError) as exc:
+                    raise SchemaError(f"Custom target '{key}' value '{v}' is not numeric.") from exc
+                if not np.isfinite(fv):
+                    raise SchemaError(f"Custom target '{key}' contains NaN or Inf.")
+                cleaned[key] = fv
+            object.__setattr__(self, "custom_targets", cleaned)
+
+    def get_target(self, target_name: str) -> float | None:
+        """Retrieve a canonical carbon target or a custom domain target value by name."""
+        if target_name in ("soc_pct", "sic_pct", "tc_pct"):
+            return getattr(self, target_name, None)
+        if target_name in self.custom_targets:
+            return self.custom_targets[target_name]
+        val = getattr(self, target_name, None)
+        return float(val) if isinstance(val, (int, float)) else None
+
     @property
     def closure_residual_pct(self) -> float | None:
         """Compute r_TC = TC - SOC - SIC if all three are present."""
@@ -518,6 +543,7 @@ class SoilReference:
             "soil_class_id": self.soil_class_id,
             "soil_class_name": self.soil_class_name,
             "taxonomy_version": self.taxonomy_version,
+            **({"custom_targets": dict(self.custom_targets)} if self.custom_targets else {}),
         }
 
 

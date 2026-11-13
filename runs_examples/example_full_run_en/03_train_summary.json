@@ -1,7 +1,8 @@
 {
   "command": "train",
-  "artifact_dir": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032731_full_run/03_artifact_bundle",
+  "artifact_dir": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_041317_full_run/03_artifact_bundle",
   "selected_model": "kernel_ridge_rbf",
+  "target": "soc_pct",
   "target_names": [
     "soc_pct",
     "sic_pct",
@@ -9,7 +10,7 @@
   ],
   "suppression_mode": "epo",
   "multi_target": true,
-  "bundle_sha256": "cb15da6acd0eea65805bb4171495bc05e683f1313e2dab43f9d2efd9fed21fa0",
+  "bundle_sha256": "979857576374fc1400694dc7112384c1911c103366b85be109ef810e78fb263d",
   "is_synthetic_smoke_only": true,
   "oof_metrics": {
     "n_samples": 80,
@@ -25,6 +26,6 @@
     "max_abs_closure_residual": null,
     "mean_abs_closure_residual": null
   },
-  "pdf_report_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032731_full_run/03_training_summary.pdf",
+  "pdf_report_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_041317_full_run/03_training_summary.pdf",
   "lang": "en"
 }

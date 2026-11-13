@@ -24,7 +24,7 @@ out = Path("$WORK_DIR")
 gen = SyntheticGeneratorV2(SyntheticConfig(dataset_id="cli_demo_v1", n_samples=60, n_sites=6, seed=42))
 ds = gen.generate_dataset()
 save_dataset_json(ds, out / "dataset.json")
-wet_ds, dry_ds = gen.generate_paired_wet_dry_dataset(n_pairs=18)
+dry_ds, wet_ds = gen.generate_paired_wet_dry_dataset(n_pairs=18)
 save_dataset_json(wet_ds, out / "wet.json")
 save_dataset_json(dry_ds, out / "dry.json")
 PY

@@ -266,15 +266,20 @@ class STSoilAnalyzer:
         t2 = time.perf_counter()
         model = self._artifact.model
         primary_target = model.target_names[0] if model.target_names else "soc_pct"
+        is_custom_target = primary_target not in ("soc_pct", "sic_pct", "tc_pct")
+        soc_pct: float = 0.0
+        soc_std: float = 0.1
         sic_pct: float | None = None
         sic_std: float | None = None
         tc_pct: float | None = None
         tc_std: float | None = None
         closure_residual_pct: float | None = None
         hybrid_class_probs: list[float] | None = None
+        custom_pred_vals: dict[str, float] = {}
+        custom_pred_stds: dict[str, float] = {}
 
         if isinstance(model, STSoilHybridNetRegressor):
-            has_soc_pred = True
+            has_soc_pred = not is_custom_target
             struct = model.predict_structured(fused.X_spectral, fused.X_covariates)
             soc_pct = float(struct.soc_mean_pct[0])
             soc_std = float(struct.soc_std_pct[0]) if struct.soc_std_pct is not None else 0.1
@@ -295,6 +300,9 @@ class STSoilAnalyzer:
                 primary_mean, primary_std = tc_pct, (tc_std or soc_std)
             else:
                 primary_mean, primary_std = soc_pct, soc_std
+                if is_custom_target:
+                    custom_pred_vals[primary_target] = primary_mean
+                    custom_pred_stds[f"{primary_target}_std"] = primary_std
         else:
             mean_arr, std_arr = model.predict_distribution(fused.X_fused)
             mean_2d = np.atleast_2d(np.asarray(mean_arr, dtype=np.float64))
@@ -312,7 +320,22 @@ class STSoilAnalyzer:
             primary_mean = preds_by_name.get(primary_target, float(mean_2d[0, 0]))
             primary_std = stds_by_name.get(primary_target, float(std_2d[0, 0]))
 
-            if len(preds_by_name) > 1 or mean_2d.shape[1] > 1:
+            for tname, val in preds_by_name.items():
+                if tname not in ("soc_pct", "sic_pct", "tc_pct"):
+                    custom_pred_vals[tname] = val
+                    custom_pred_stds[f"{tname}_std"] = stds_by_name.get(tname, primary_std)
+
+            if is_custom_target:
+                has_soc_pred = "soc_pct" in preds_by_name
+                soc_pct = preds_by_name.get("soc_pct", 0.0)
+                soc_std = stds_by_name.get("soc_pct", primary_std)
+                sic_pct = preds_by_name.get("sic_pct")
+                sic_std = stds_by_name.get("sic_pct")
+                tc_pct = preds_by_name.get("tc_pct")
+                tc_std = stds_by_name.get("tc_pct")
+                custom_pred_vals.setdefault(primary_target, primary_mean)
+                custom_pred_stds.setdefault(f"{primary_target}_std", primary_std)
+            elif len(preds_by_name) > 1 or mean_2d.shape[1] > 1:
                 has_soc_pred = ("soc_pct" in preds_by_name) or (primary_target != "sic_pct")
                 soc_pct = preds_by_name.get("soc_pct", primary_mean)
                 soc_std = stds_by_name.get("soc_pct", primary_std)
@@ -372,19 +395,25 @@ class STSoilAnalyzer:
 
         # Stage 5: Carbon Accounting & Stock (Strict DEF-005 / ADR-004 Compliance)
         t4 = time.perf_counter()
-        fraction_res = partition_carbon(
-            soc=soc_pct if has_soc_pred else None,
-            sic=sic_pct,
-            tc=tc_pct,
-            unit="pct",
-            dry_matter_basis=True,
-            closure_tolerance_pct=self._artifact.target_schema.closure_tolerance_pct,
-        )
+        if not is_custom_target:
+            fraction_res = partition_carbon(
+                soc=soc_pct if has_soc_pred else None,
+                sic=sic_pct,
+                tc=tc_pct,
+                unit="pct",
+                dry_matter_basis=True,
+                closure_tolerance_pct=self._artifact.target_schema.closure_tolerance_pct,
+            )
+            fraction_flags = list(fraction_res.quality_flags)
+            fraction_closure = fraction_res.closure_residual_pct
+        else:
+            fraction_flags = []
+            fraction_closure = None
 
-        # Compute single-layer stock only if bulk_density is present; never fallback to 1.35
+        # Compute single-layer stock only for soil carbon targets when bulk_density is present
         stock_carbon_val = tc_pct if (primary_target == "tc_pct" and tc_pct is not None) else soc_pct
         stock_carbon_std = tc_std if (primary_target == "tc_pct" and tc_std is not None) else soc_std
-        if include_stock:
+        if include_stock and not is_custom_target:
             stock_res = compute_layer_stock(
                 carbon_value=stock_carbon_val,
                 carbon_unit="pct",
@@ -402,12 +431,17 @@ class STSoilAnalyzer:
             carbon_stock_block = stock_res.to_dict()
             stock_flags = list(stock_res.quality_flags)
         else:
+            note_msg = (
+                f"Carbon stock disabled for non-carbon domain target '{primary_target}'."
+                if is_custom_target
+                else "Carbon stock computation disabled (`include_stock=False`)."
+            )
             carbon_stock_block = {
                 "stock_mg_ha": None,
                 "stock_std_mg_ha": None,
                 "quality_status": QualityStatus.OK.value,
                 "quality_flags": [],
-                "notes": ["Carbon stock computation disabled (`include_stock=False`)."],
+                "notes": [note_msg],
             }
             stock_flags = []
 
@@ -419,25 +453,30 @@ class STSoilAnalyzer:
             "sic_std_pct": sic_std,
             "tc_pct": tc_pct,
             "tc_std_pct": tc_std,
-            "unit": "pct",
+            "unit": "custom" if is_custom_target else "pct",
             "dry_matter_basis": True,
             "confidence_interval": ci_block,
             "closure_residual_pct": (
                 closure_residual_pct
                 if closure_residual_pct is not None
-                else fraction_res.closure_residual_pct
+                else fraction_closure
             ),
+            **custom_pred_vals,
+            **custom_pred_stds,
         }
 
-        # Stage 6: Provisional Soil Classification (OD-005)
-        cls_res = classify_soil_provisional(
-            soc=soc_pct if primary_target != "sic_pct" else 0.0,
-            sic=sic_pct or 0.0,
-            unit="pct",
-        )
-        classification_block: dict[str, Any] = cls_res.to_dict()
-        if hybrid_class_probs is not None:
-            classification_block["probabilities"] = hybrid_class_probs
+        # Stage 6: Provisional Soil Classification (OD-005; soil carbon targets only)
+        if not is_custom_target:
+            cls_res = classify_soil_provisional(
+                soc=soc_pct if primary_target != "sic_pct" else 0.0,
+                sic=sic_pct or 0.0,
+                unit="pct",
+            )
+            classification_block: dict[str, Any] | None = cls_res.to_dict()
+            if hybrid_class_probs is not None:
+                classification_block["probabilities"] = hybrid_class_probs
+        else:
+            classification_block = None
         timings["carbon_accounting_ms"] = (time.perf_counter() - t4) * 1000.0
 
         # Stage 7: Optional XAI
@@ -457,9 +496,17 @@ class STSoilAnalyzer:
         # Aggregate QualityMetadata and overall QualityStatus
         all_flags: list[QualityFlag] = list(measurement.quality.flags)
         all_notes: list[str] = list(measurement.quality.notes)
-        for fl in list(qc_report.flags) + list(fraction_res.quality_flags) + stock_flags:
+        for fl in list(qc_report.flags) + fraction_flags + stock_flags:
+            if is_custom_target and fl in (QualityFlag.CARBONATE_BAND_UNAVAILABLE, QualityFlag.MISSING_BULK_DENSITY):
+                continue
             if fl not in all_flags:
                 all_flags.append(fl)
+        if is_custom_target:
+            all_flags = [
+                fl
+                for fl in all_flags
+                if fl not in (QualityFlag.CARBONATE_BAND_UNAVAILABLE, QualityFlag.MISSING_BULK_DENSITY)
+            ]
         missing_covs = dict(fused.missing_reasons[0]) if fused.missing_reasons else {}
         if missing_covs:
             for reason in missing_covs.values():

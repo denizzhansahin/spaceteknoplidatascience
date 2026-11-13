@@ -239,6 +239,8 @@ Hedef sahada/edge cihazda internet erişimi olmadan kurulum yapmak için önce w
 
 ## 7. İlgili Dokümantasyon
 
+- **Veri Seti Hazırlama ve Şema Rehberi (TR & EN):** [DATA_PREPARATION_AND_SCHEMA_GUIDE.md](DATA_PREPARATION_AND_SCHEMA_GUIDE.md)
+- **Tüm CLI & Python Parametreleri Referansı (TR & EN):** [CLI_AND_PYTHON_PARAMETERS_GUIDE.md](CLI_AND_PYTHON_PARAMETERS_GUIDE.md)
 - **Toprak Analizi Çift Dilli (TR & EN) Bilimsel & Uygulama Rehberi:** [TOPRAK_ANALIZ.md](TOPRAK_ANALIZ.md)
 - **Toprak Dışı & Genel Spektral / Çok-Sensörlü Veri Analizi Rehberi (TR & EN):** [GENERAL_DATA_ANALYSIS_GUIDE.md](GENERAL_DATA_ANALYSIS_GUIDE.md)
 - **Akademik Metodoloji ve Matematiksel Formülasyon (%90 Bilimsel / %10 Yazılım İlişkisi):** [ACADEMIC_METHODOLOGY_AND_ALGORITHMS.md](ACADEMIC_METHODOLOGY_AND_ALGORITHMS.md)

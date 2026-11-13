@@ -2,7 +2,7 @@
 
 > **Dil Seçimi / Language:** **Bölüm A (Türkçe)** · **Part B (English)**  
 > **Sürüm / Version:** `st-ds v0.1.0`  
-> **Kapsam / Scope:** STDS motorunun yalnızca toprak karbonu için değil, **her türlü spektral, çok-sensörlü, çevresel, tarımsal, mineralojik ve konumsal regresyon verisi** için nasıl kullanılacağını açıklar; alan-bağımsız (~%80) ve toprak-özel (~%20) katmanların sınırını dürüstçe ortaya koyar.
+> **Kapsam / Scope:** STDS (**SpaceTeknopoliDataScience**) motoru bugün doğrudan **toprak karbonu analizi (SOC / SIC / TC / Karbon Stoku)** için uzmanlaşmıştır (~%20 domain katmanı); ancak çekirdek mimarisinin **~%80'i tamamen alan-bağımsızdır**. Gelecekte **hava kalitesi, gıda spektroskopisi, donanım/sensör telemetrisi, madencilik veya su kalitesi** analizleri için de `--target <ozel_hedef>`, özel `InstrumentProfile` JSON ve Python API ile nasıl kullanılacağını açıklar.
 
 ---
 
@@ -52,7 +52,10 @@ Aşağıdaki alanların tamamı STDS'nin **sızıntısız CV, EPO bozucu etki ba
 3. **Su Kalitesi, Atıksu & Çevresel İzleme (Hidroloji & Çevre Mühendisliği)**
    - **Girdi:** UV-Vis absorbans spektrumu (`200–750 nm`, çözünmüş organik madde **DOC** ve nitrat pikleri) + elektrot sensör eş değişkenleri (`EC`, `pH`, `DO`, bulanıklık `NTU`, sıcaklık) + göl/nehir istasyon koordinatları.
    - **EPO Kullanımı:** Bulanıklık veya mevsimsel sıcaklık etkisini eşleşmiş kalibrasyon çiftleriyle bastırın.
-4. **Endüstriyel Proses / İlaç / Polimer Kalite Kontrolü & Tabular Çok-Sensörlü Füzyon**
+   - [x] **Gıda & Kalite Spektroskopisi (Tahıl Proteini / Şeker Brix / Nem) + PAT:** NIR spektrumu (`700–1050 nm`) + örnek sıcaklığı → `protein_pct` veya `brix_deg`.
+   - [x] **Hava Kalitesi / Çevresel Gaz & Partikül Analizi:** UV-Vis / optik bantlar + sıcaklık/nem/EC sensörleri → `pm25_ugm3` veya `no2_ppb` + istasyon GPS Kriging haritası.
+   - [x] **Donanım & Sensör Telemetrisi / EIS Empedans Analizi:** Çok-frekanslı EIS (`z_real_ohm`, `z_imag_ohm`) + sıcaklık → donanım sürüklenmesi / aşınma indeksi (`wear_index`).
+   - [x] **Endüstriyel Proses / Polimer Kalite Kontrolü & Tabular Çok-Sensörlü Füzyon**
    - Yakın kızılötesi (PAT / NIR) hat içi tablet etken madde tayini, yem/tahıl nem-protein analizi veya **yalnızca sayısal sensör dizilerinden** oluşan çok değişkenli kestirim problemleri.
 
 ---
@@ -63,8 +66,8 @@ Mevcut `v0.1.0` sürümünde toprak dışındaki verileri analiz ederken bilmeni
 
 | Yöntem | Ne Zaman Tercih Edilir? | Önemli Detay & Sınır |
 | --- | --- | --- |
-| **Yol 1: Mevcut `st-ds` CLI + PDF / 26 PNG Paketi** | Sıfır kod yazarak **26 grafik, 5 tablo, HTML pano, Kriging haritası ve Tam PDF Raporu** almak istediğinizde. | `TargetLabelSchema` kanonik olarak `soc_pct`, `sic_pct`, `tc_pct` alanlarını bekler. Bir ana hedef skalerinizi (ör. Yaprak Azot % veya Cevher Cu %) şimdilik `soc_pct` yuvasına eşleyip `--target soc_pct` (tek hedef, `--no-require-sic`, `MULTI_TARGET=0`) ve kendi cihaz `InstrumentProfile` JSON'unuzla tam `03_run_full_pipeline.sh` hattını kullanabilirsiniz. Toprak stokunun yanlış hesaplanmaması için `bulk_density` alanını boş bırakın (`stock = None`, sessiz tahmin yapılmaz). |
-| **Yol 2: Doğrudan Python API (`st_ds.*`)** | Hedef değişken adını kendiniz vermek (`target_names=("leaf_nitrogen_pct",)`), özel kovaryat setleri tanımlamak veya salt tabular/genel regresyon kurmak istediğinizde. | `ChemometricPipeline`, `FeatureFusionPipeline`, `PLSRRegressor` / `KernelRidgeRegressor` / `RandomForestSoilRegressor` / `LocalPLSRRegressor`, `ConformalUncertaintyCalibrator`, `OutOfDomainDetector`, `compute_spatial_kriging_bundle` ve `SAFER/ArtifactBundle` tamamen hedef isminden bağımsız çalışır. |
+| **Yol 1: `st-ds` CLI + PDF / 26 PNG Paketi (`--target <özel>` destekli)** | Sıfır kod yazarak **26 grafik, 5 tablo, HTML pano, Kriging haritası ve Tam PDF Raporu** almak istediğinizde. | Kendi sensör dalga boylarınızı içeren özel bir `InstrumentProfile` JSON'unu **`--instrument-profile sensor.json`**, kendi sayısal hedef sütununuzu (ör. `protein_pct`, `pm25_ugm3`, `wear_index`) **`--target protein_pct`** (ve karbona özgü olmayan hedeflerde `--no-require-sic`) olarak geçin; CLI `SoilReference.custom_targets` üzerine okuyup tam eğitim, OOD, Conformal UQ, XAI ve görselleştirmeyi çalıştırır. |
+| **Yol 2: Doğrudan Python API (`st_ds.*`)** | Özel kovaryat isimleri (`covariate_names`), saf tabular mühendislik veya programatik döngüler kurmak istediğinizde. | `ChemometricPipeline`, `FeatureFusionPipeline`, `PLSRRegressor` / `KernelRidgeRegressor` / `RandomForestSoilRegressor` / `LocalPLSRRegressor`, `ConformalUncertaintyCalibrator`, `OutOfDomainDetector`, `compute_spatial_kriging_bundle` ve `.safetensors` paketi tamamen hedef isminden bağımsız çalışır. |
 
 ---
 

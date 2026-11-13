@@ -1,0 +1,143 @@
+{
+  "dataset_card": {
+    "dataset_card_version": "1.0.0",
+    "manifest": {
+      "dataset_id": "stds_synth_20261113_041532",
+      "dataset_source": "synthetic",
+      "instrument_profile_id": "visnir_24ch_v1",
+      "n_records": 80,
+      "n_unique_samples": 80,
+      "n_unique_sites": 8,
+      "schema_version": "1.0.0",
+      "sha256_hash": "a7ed9146f7ead0aad6a9c3eb08defffe10929334672c74d0d6e915f834f70bfe",
+      "created_utc": "2026-11-12T00:00:00Z",
+      "description": "Physics-informed synthetic soil dataset (seed=42)"
+    },
+    "is_synthetic": true,
+    "intended_use": "Software pipeline verification and smoke testing only; NOT field evidence.",
+    "lineage": {
+      "site_count": 8,
+      "site_distribution": {
+        "site_01": 10,
+        "site_02": 10,
+        "site_03": 10,
+        "site_04": 10,
+        "site_05": 10,
+        "site_06": 10,
+        "site_07": 10,
+        "site_08": 10
+      },
+      "texture_classes": [
+        "clay_loam",
+        "loam"
+      ],
+      "sample_preparations": [
+        "air_dried_sieved_2mm"
+      ],
+      "moisture_scenarios": {
+        "dry": 16,
+        "field_moist": 36,
+        "wet": 28
+      },
+      "soc_methods": [
+        "dry_combustion_acid_pretreated_iso10694"
+      ],
+      "sic_methods": [
+        "calcimeter_iso10693"
+      ]
+    },
+    "data_quality": {
+      "missing_bulk_density_count": 0,
+      "target_distributions_pct": {
+        "soc_pct": {
+          "min": 0.2,
+          "max": 5.892657596717889,
+          "mean": 2.871125739178488,
+          "std": 1.2949784456621407,
+          "median": 2.766172654613009,
+          "iqr": 1.7809663003360199
+        },
+        "sic_pct": {
+          "min": 0.7470533715417857,
+          "max": 4.449757097933055,
+          "mean": 2.413013667163333,
+          "std": 0.9019643647885455,
+          "median": 2.306942445657853,
+          "iqr": 1.2935849998431637
+        },
+        "tc_pct": {
+          "min": 1.6808964058929003,
+          "max": 8.89072041500169,
+          "mean": 5.28413940634182,
+          "std": 1.5656423636365062,
+          "median": 5.3866699906471425,
+          "iqr": 2.1324217666151917
+        }
+      }
+    }
+  },
+  "quality_report": {
+    "manifest": {
+      "dataset_id": "stds_synth_20261113_041532",
+      "dataset_source": "synthetic",
+      "instrument_profile_id": "visnir_24ch_v1",
+      "n_records": 80,
+      "n_unique_samples": 80,
+      "n_unique_sites": 8,
+      "schema_version": "1.0.0",
+      "sha256_hash": "a7ed9146f7ead0aad6a9c3eb08defffe10929334672c74d0d6e915f834f70bfe",
+      "created_utc": "2026-11-12T00:00:00Z",
+      "description": "Physics-informed synthetic soil dataset (seed=42)"
+    },
+    "is_synthetic": true,
+    "site_distribution": {
+      "site_01": 10,
+      "site_02": 10,
+      "site_03": 10,
+      "site_04": 10,
+      "site_05": 10,
+      "site_06": 10,
+      "site_07": 10,
+      "site_08": 10
+    },
+    "moisture_scenarios": {
+      "dry": 16,
+      "field_moist": 36,
+      "wet": 28
+    },
+    "missing_bulk_density_count": 0,
+    "target_distributions_pct": {
+      "soc_pct": {
+        "min": 0.2,
+        "max": 5.892657596717889,
+        "mean": 2.871125739178488,
+        "std": 1.2949784456621407,
+        "median": 2.766172654613009,
+        "iqr": 1.7809663003360199
+      },
+      "sic_pct": {
+        "min": 0.7470533715417857,
+        "max": 4.449757097933055,
+        "mean": 2.413013667163333,
+        "std": 0.9019643647885455,
+        "median": 2.306942445657853,
+        "iqr": 1.2935849998431637
+      },
+      "tc_pct": {
+        "min": 1.6808964058929003,
+        "max": 8.89072041500169,
+        "mean": 5.28413940634182,
+        "std": 1.5656423636365062,
+        "median": 5.3866699906471425,
+        "iqr": 2.1324217666151917
+      }
+    }
+  },
+  "files": {
+    "dataset_json": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_041530_full_run/01_input_data/dataset.json",
+    "dataset_csv": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_041530_full_run/01_input_data/dataset.csv",
+    "dataset_meta_json": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_041530_full_run/01_input_data/dataset.meta.json",
+    "wet_pairs_json": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_041530_full_run/01_input_data/wet_pairs.json",
+    "dry_pairs_json": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_041530_full_run/01_input_data/dry_pairs.json"
+  }
+}

@@ -573,11 +573,12 @@ def generate_prediction_pdf_report(
             pick_text(eff_lang, tr=f"• Toplam Kayıt / Kısmi Hata: {n_ok} / {n_fail}", en=f"• Total Records / Partial Failures: {n_ok} / {n_fail}"),
         ]
         if "selected_model" in payload:
+            disp_target = payload.get("target") or ((payload.get("target_names") or ["soc_pct"])[0])
             meta_lines.append(
                 pick_text(
                     eff_lang,
-                    tr=f"• Seçilen Model & Hedef: {payload.get('selected_model')} ({payload.get('target', 'soc_pct')})",
-                    en=f"• Selected Model & Target: {payload.get('selected_model')} ({payload.get('target', 'soc_pct')})",
+                    tr=f"• Seçilen Model & Hedef: {payload.get('selected_model')} ({disp_target})",
+                    en=f"• Selected Model & Target: {payload.get('selected_model')} ({disp_target})",
                 )
             )
             meta_lines.append(f"• Bundle SHA-256: {str(payload.get('bundle_sha256', '-'))[:24]}...")

@@ -10,8 +10,9 @@
 
 | Vitrin Klasörü / Showcase Folder | Dil / Language | İçerik Özeti / Highlights | Ana Rapor / Primary PDF |
 | :--- | :--- | :--- | :--- |
-| `example_full_run_tr/` | Türkçe (`tr`) | Tam sentetik veri + doğrulama + EPO + CV + eğitim + tahmin/XAI + 26 PNG + 5 CSV/MD tablo + interaktif 3D HTML + web pano + PDF raporlar | [00_STDS_FULL_ANALYSIS_REPORT.pdf](example_full_run_tr/00_STDS_FULL_ANALYSIS_REPORT.pdf) |
-| `example_full_run_en/` | English (`en`) | Same complete end-to-end run localized in English | [00_STDS_FULL_ANALYSIS_REPORT.pdf](example_full_run_en/00_STDS_FULL_ANALYSIS_REPORT.pdf) |
+| `example_full_run_tr/` | Türkçe (`tr`) | Varsayılan `TARGET=soc_pct` + `MODEL=auto` + aktif EPO + 26 PNG + 5 CSV/MD tablo + interaktif 3D HTML + web pano + PDF raporlar | [00_STDS_FULL_ANALYSIS_REPORT.pdf](example_full_run_tr/00_STDS_FULL_ANALYSIS_REPORT.pdf) |
+| `example_full_run_en/` | English (`en`) | Same complete end-to-end showcase localized in English (`TARGET=soc_pct`, `MODEL=auto`, EPO active) | [00_STDS_FULL_ANALYSIS_REPORT.pdf](example_full_run_en/00_STDS_FULL_ANALYSIS_REPORT.pdf) |
+| `example_tc_plsr_tr/` | Türkçe (`tr`) | Farklı hedef ve sabit model örneği: **`TARGET=tc_pct` + `MODEL=plsr`** (PDF 1. sayfada seçilen hedef ve modelin nasıl değiştiğini gösterir) | [00_STDS_FULL_ANALYSIS_REPORT.pdf](example_tc_plsr_tr/00_STDS_FULL_ANALYSIS_REPORT.pdf) |
 
 ---
 

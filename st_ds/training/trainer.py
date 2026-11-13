@@ -150,7 +150,7 @@ def _extract_target_vector(records: Sequence[Measurement], target_name: str) -> 
             raise SchemaError(
                 f"Measurement '{r.sample_id}' lacks a SoilReference; cannot train/evaluate supervised model."
             )
-        v = getattr(r.reference, target_name, None)
+        v = r.reference.get_target(target_name)
         if v is None:
             raise SchemaError(
                 f"Measurement '{r.sample_id}' has missing target '{target_name}' in SoilReference."
@@ -165,7 +165,7 @@ def _extract_optional_target(records: Sequence[Measurement], field_name: str) ->
         if r.reference is None:
             vals.append(float("nan"))
         else:
-            v = getattr(r.reference, field_name, None)
+            v = r.reference.get_target(field_name)
             vals.append(float(v) if v is not None else float("nan"))
     return np.asarray(vals, dtype=float)
 
@@ -299,7 +299,7 @@ class STSoilTrainer:
                 external_dry=dry_dataset,
             )
             fusion = FeatureFusionPipeline(self.config.fusion_config)
-            fusion.fit(tr_recs, chemometric_pipeline=chemo)
+            fusion.fit(tr_recs, chemometric_pipeline=chemo, profile=dataset.instrument_profile)
 
             tr_fused = fusion.build_feature_vector(tr_recs, chemometric_pipeline=chemo)
             va_fused = fusion.build_feature_vector(va_recs, chemometric_pipeline=chemo)
@@ -322,7 +322,11 @@ class STSoilTrainer:
                     dataset_source=dataset.dataset_source,
                 )
 
-                if isinstance(model, STSoilHybridNetRegressor) and np.all(np.isfinite(soc_tr)):
+                if (
+                    isinstance(model, STSoilHybridNetRegressor)
+                    and self.config.target_name in ("soc_pct", "sic_pct", "tc_pct")
+                    and np.all(np.isfinite(soc_tr))
+                ):
                     model.fit_multitask(
                         tr_fused.X_spectral,
                         tr_fused.X_covariates,

@@ -83,7 +83,7 @@ json_path = save_dataset_json(ds, out / "dataset.json")
 csv_path = save_dataset_csv(ds, out / "dataset.csv")
 
 # 3b. Dış Parametre Ortogonalizasyonu (EPO) için eşleşmiş Islak / Kuru spektrumlar
-wet_ds, dry_ds = gen.generate_paired_wet_dry_dataset(n_pairs=int("$N_PAIRS"))
+dry_ds, wet_ds = gen.generate_paired_wet_dry_dataset(n_pairs=int("$N_PAIRS"))
 wet_path = save_dataset_json(wet_ds, out / "wet_pairs.json")
 dry_path = save_dataset_json(dry_ds, out / "dry_pairs.json")
 

@@ -1,7 +1,8 @@
 {
   "command": "dataset validate",
-  "dataset_id": "stds_synth_20261113_032733",
+  "dataset_id": "stds_synth_20261113_041319",
   "dataset_source": "synthetic",
+  "target": "soc_pct",
   "is_valid": true,
   "n_records": 80,
   "n_errors": 0,

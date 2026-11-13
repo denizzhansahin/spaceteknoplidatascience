@@ -55,7 +55,7 @@ class DataValidator:
                 raise SchemaError(f"Measurement '{measurement.sample_id}' lacks SoilReference labels.")
             schema = target_schema or TargetLabelSchema()
             for target_name in schema.targets:
-                if getattr(measurement.reference, target_name, None) is None:
+                if measurement.reference.get_target(target_name) is None:
                     raise SchemaError(
                         f"Measurement '{measurement.sample_id}' is missing required target '{target_name}'."
                     )
@@ -77,15 +77,22 @@ class DataValidator:
         *,
         for_training: bool = False,
         require_sic: bool = True,
+        target_name: str = "soc_pct",
         target_schema: TargetLabelSchema | None = None,
     ) -> ValidationSummary:
         """Validate an entire SoilDataset and return a structured ValidationSummary."""
         errors: list[dict[str, Any]] = []
         warnings: list[str] = []
 
+        eff_target_schema = target_schema
+        if eff_target_schema is None and target_name != "soc_pct":
+            eff_target_schema = TargetLabelSchema(targets=(target_name,))
+        elif eff_target_schema is None and not require_sic:
+            eff_target_schema = TargetLabelSchema(targets=("soc_pct",))
+
         if for_training:
             try:
-                dataset.validate_for_training(require_sic=require_sic)
+                dataset.validate_for_training(require_sic=require_sic, target_name=target_name)
             except SchemaError as exc:
                 errors.append(exc.to_dict())
 
@@ -94,7 +101,7 @@ class DataValidator:
                 rec_warnings = cls.validate_measurement(
                     rec,
                     require_reference=for_training,
-                    target_schema=target_schema,
+                    target_schema=eff_target_schema,
                 )
                 warnings.extend(rec_warnings)
             except SchemaError as exc:

@@ -18,7 +18,7 @@ STDS (Soil Carbon Spectroscopy & Sensor Fusion Toolkit), toprak spektrumlarını
 4. Yeni örnekler için **%90 Conformal güven aralığı**, **OOD (alan dışı uyarısı)**, **karbon fraksiyon kapatma kontrolü** ve **katman karbon stoku (`Mg C ha⁻¹`)** hesaplar (`predict`),
 5. Tüm veri, model, XAI ve harita analizlerini **26+ bilimsel 2D/3D grafik**, **5 analitik CSV/Markdown tablosu** ve **çevrimdışı HTML panosu** olarak üretir (`visualize`).
 
-> 💡 **Toprak Dışı Veri Analizi:** STDS motorunun ~%80'i (kemometri, EPO, CV benchmark, Conformal UQ, OOD, XAI, Kriging, 26 PNG & PDF) yaprak azotu, mineraloji, su kalitesi ve genel sensör/tabular veriler için de doğrudan kullanılabilir; bkz. **[Toprak Dışı & Genel Veri Analizi Rehberi (TR & EN)](GENERAL_DATA_ANALYSIS_GUIDE.md)**.
+> 💡 **Toprak Dışı Veri Analizi & Tam Parametreler:** STDS motorunun ~%80'i gıda, hava kalitesi, donanım sensörü, yaprak azotu ve genel tabular veriler için de kullanılabilir; bkz. **[Toprak Dışı & Genel Veri Analizi (TR & EN)](GENERAL_DATA_ANALYSIS_GUIDE.md)**, **[Veri Seti Hazırlama & Şema Kuralları](DATA_PREPARATION_AND_SCHEMA_GUIDE.md)** ve **[Tüm CLI/Python Parametreleri](CLI_AND_PYTHON_PARAMETERS_GUIDE.md)**.
 
 ---
 

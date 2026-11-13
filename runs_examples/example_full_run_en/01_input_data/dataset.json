@@ -1,6 +1,6 @@
 {
   "manifest": {
-    "dataset_id": "stds_synth_20261113_032733",
+    "dataset_id": "stds_synth_20261113_041319",
     "dataset_source": "synthetic",
     "instrument_profile_id": "visnir_24ch_v1",
     "n_records": 80,

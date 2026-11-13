@@ -13,7 +13,7 @@ import hashlib
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 
 import numpy as np
 import pandas as pd
@@ -74,6 +74,7 @@ class SoilDataset:
     dataset_source: DatasetSourceType = "real_lab"
     description: str = ""
     allow_mixed_profiles: bool = False
+    instrument_profile: InstrumentProfile | None = field(default=None, repr=False, compare=False)
 
     def __post_init__(self) -> None:
         if not self.dataset_id or not self.dataset_id.strip():
@@ -156,29 +157,42 @@ class SoilDataset:
             description=self.description,
         )
 
-    def validate_for_training(self, *, require_sic: bool = True) -> None:
+    def validate_for_training(self, *, require_sic: bool = True, target_name: str = "soc_pct") -> None:
         """Verify that every record has complete lineage and reference labels required for training."""
+        is_carbon_target = target_name in ("soc_pct", "sic_pct", "tc_pct")
         for idx, r in enumerate(self.records):
             if r.site_id == "unknown_site" or not r.site_id.strip():
                 raise SchemaError(
                     f"Record {idx} (sample_id='{r.sample_id}') lacks valid site_id lineage required for grouped splitting.",
                     details={"sample_id": r.sample_id},
                 )
-            if r.reference is None or r.reference.soc_pct is None:
+            if r.reference is None:
                 raise SchemaError(
-                    f"Record {idx} (sample_id='{r.sample_id}') lacks reference SOC label.",
+                    f"Record {idx} (sample_id='{r.sample_id}') lacks SoilReference labels.",
                     details={"sample_id": r.sample_id},
                 )
-            if require_sic and r.reference.sic_pct is None:
-                raise SchemaError(
-                    f"Record {idx} (sample_id='{r.sample_id}') lacks reference SIC label.",
-                    details={"sample_id": r.sample_id},
-                )
-            if not r.reference.soc_method:
-                raise SchemaError(
-                    f"Record {idx} (sample_id='{r.sample_id}') lacks reference laboratory method provenance.",
-                    details={"sample_id": r.sample_id},
-                )
+            if is_carbon_target:
+                if r.reference.get_target(target_name) is None:
+                    raise SchemaError(
+                        f"Record {idx} (sample_id='{r.sample_id}') lacks reference target label '{target_name}'.",
+                        details={"sample_id": r.sample_id, "target_name": target_name},
+                    )
+                if require_sic and r.reference.sic_pct is None:
+                    raise SchemaError(
+                        f"Record {idx} (sample_id='{r.sample_id}') lacks reference SIC label.",
+                        details={"sample_id": r.sample_id},
+                    )
+                if not r.reference.soc_method:
+                    raise SchemaError(
+                        f"Record {idx} (sample_id='{r.sample_id}') lacks reference laboratory method provenance.",
+                        details={"sample_id": r.sample_id},
+                    )
+            else:
+                if r.reference.get_target(target_name) is None:
+                    raise SchemaError(
+                        f"Record {idx} (sample_id='{r.sample_id}') lacks custom reference target '{target_name}'.",
+                        details={"sample_id": r.sample_id, "target_name": target_name},
+                    )
 
 
 def generate_data_quality_report(dataset: SoilDataset) -> dict[str, Any]:
@@ -327,6 +341,7 @@ def measurement_from_dict(item: Mapping[str, Any]) -> Measurement:
                 soil_class_id=ref_d.get("soil_class_id"),
                 soil_class_name=ref_d.get("soil_class_name"),
                 taxonomy_version=ref_d.get("taxonomy_version", "provisional_taxonomy_v0"),
+                custom_targets=dict(ref_d.get("custom_targets") or {}),
             )
         depth_d = item["depth_interval"]
         coord_obj = None
@@ -394,10 +409,18 @@ def load_dataset_json(path: str | Path) -> SoilDataset:
     return dataset
 
 
-def _dataset_to_dataframe(dataset: SoilDataset) -> tuple[pd.DataFrame, list[str]]:
+def _dataset_to_dataframe(dataset: SoilDataset) -> tuple[pd.DataFrame, list[str], list[str]]:
     rows: list[dict[str, Any]] = []
     first_spec = dataset.records[0].spectrum
     wl_cols = [f"wl_{w:.2f}nm" for w in first_spec.wavelength_grid_nm]
+    custom_cols = sorted(
+        {
+            key
+            for r in dataset.records
+            if r.reference and r.reference.custom_targets
+            for key in r.reference.custom_targets
+        }
+    )
 
     for r in dataset.records:
         if r.spectrum.values.ndim != 1:
@@ -437,11 +460,13 @@ def _dataset_to_dataframe(dataset: SoilDataset) -> tuple[pd.DataFrame, list[str]
             "soil_class_id": r.reference.soil_class_id if r.reference else None,
             "soil_class_name": r.reference.soil_class_name if r.reference else None,
         }
+        for c_col in custom_cols:
+            row[c_col] = r.reference.custom_targets.get(c_col) if r.reference else None
         for col_name, val in zip(wl_cols, r.spectrum.values):
             row[col_name] = float(val)
         rows.append(row)
 
-    return pd.DataFrame(rows), wl_cols
+    return pd.DataFrame(rows), wl_cols, custom_cols
 
 
 def _dataframe_to_dataset(
@@ -453,6 +478,8 @@ def _dataframe_to_dataset(
     ch_ids: tuple[str, ...],
     spec_cols: list[str],
     mode: SpectralSignalMode,
+    target_columns: Sequence[str] | None = None,
+    instrument_profile: InstrumentProfile | None = None,
 ) -> SoilDataset:
     def _opt_float(val: Any) -> float | None:
         if val is None or (isinstance(val, float) and np.isnan(val)) or pd.isna(val):
@@ -463,6 +490,12 @@ def _dataframe_to_dataset(
         if val is None or pd.isna(val):
             return None
         return str(val)
+
+    extra_target_cols = [
+        str(col)
+        for col in (target_columns or ())
+        if col not in ("soc_pct", "sic_pct", "tc_pct") and col in df.columns
+    ]
 
     records: list[Measurement] = []
     for _, row in df.iterrows():
@@ -487,8 +520,14 @@ def _dataframe_to_dataset(
         soc = _opt_float(row.get("soc_pct"))
         sic = _opt_float(row.get("sic_pct"))
         tc = _opt_float(row.get("tc_pct"))
+        custom_targets: dict[str, float] = {}
+        for c_col in extra_target_cols:
+            c_val = _opt_float(row.get(c_col))
+            if c_val is not None:
+                custom_targets[c_col] = c_val
+
         ref = None
-        if soc is not None or sic is not None or tc is not None:
+        if soc is not None or sic is not None or tc is not None or custom_targets:
             cls_id_raw = row.get("soil_class_id")
             cls_id = int(cls_id_raw) if cls_id_raw is not None and not pd.isna(cls_id_raw) else None
             ref = SoilReference(
@@ -500,6 +539,7 @@ def _dataframe_to_dataset(
                 tc_method=_opt_str(row.get("tc_method")) or "dry_combustion_dumas_iso10694",
                 soil_class_id=cls_id,
                 soil_class_name=_opt_str(row.get("soil_class_name")),
+                custom_targets=custom_targets,
             )
         lat = _opt_float(row.get("lat"))
         lon = _opt_float(row.get("lon"))
@@ -536,6 +576,7 @@ def _dataframe_to_dataset(
         dataset_id=dataset_id,
         records=records,
         dataset_source=declared_source,
+        instrument_profile=instrument_profile,
     )
 
 
@@ -544,7 +585,7 @@ def save_dataset_csv(dataset: SoilDataset, path: str | Path) -> Path:
     target = Path(path)
     target.parent.mkdir(parents=True, exist_ok=True)
     first_spec = dataset.records[0].spectrum
-    df, wl_cols = _dataset_to_dataframe(dataset)
+    df, wl_cols, custom_cols = _dataset_to_dataframe(dataset)
     df.to_csv(target, index=False)
 
     sidecar = target.with_suffix(target.suffix + ".meta.json")
@@ -554,6 +595,7 @@ def save_dataset_csv(dataset: SoilDataset, path: str | Path) -> Path:
         "channel_ids": list(first_spec.channel_ids),
         "spectral_mode": first_spec.mode.value,
         "spectral_columns": wl_cols,
+        **({"custom_target_columns": custom_cols} if custom_cols else {}),
     }
     sidecar.write_text(json.dumps(sidecar_payload, indent=2), encoding="utf-8")
     return target
@@ -563,12 +605,14 @@ def load_dataset_csv(
     path: str | Path,
     *,
     profile: InstrumentProfile | None = None,
+    target_columns: Sequence[str] | None = None,
 ) -> SoilDataset:
     """Load a SoilDataset from a CSV file and its companion `.meta.json` sidecar (or explicit profile)."""
     csv_path = Path(path)
     sidecar = csv_path.with_suffix(csv_path.suffix + ".meta.json")
     df = pd.read_csv(csv_path)
 
+    custom_cols: list[str] = list(target_columns or ())
     if sidecar.exists():
         meta = json.loads(sidecar.read_text(encoding="utf-8"))
         wl_grid = tuple(float(w) for w in meta["wavelength_grid_nm"])
@@ -577,6 +621,9 @@ def load_dataset_csv(
         mode = SpectralSignalMode(meta.get("spectral_mode", "reflectance"))
         dataset_id = meta["manifest"]["dataset_id"]
         declared_source: DatasetSourceType = meta["manifest"]["dataset_source"]
+        for c in meta.get("custom_target_columns", []):
+            if c not in custom_cols:
+                custom_cols.append(c)
     elif profile is not None:
         wl_grid = profile.wavelength_grid_nm
         ch_ids = profile.channel_ids
@@ -597,6 +644,8 @@ def load_dataset_csv(
         ch_ids=ch_ids,
         spec_cols=spec_cols,
         mode=mode,
+        target_columns=custom_cols,
+        instrument_profile=profile,
     )
 
 
@@ -605,7 +654,7 @@ def save_dataset_parquet(dataset: SoilDataset, path: str | Path) -> Path:
     target = Path(path)
     target.parent.mkdir(parents=True, exist_ok=True)
     first_spec = dataset.records[0].spectrum
-    df, wl_cols = _dataset_to_dataframe(dataset)
+    df, wl_cols, custom_cols = _dataset_to_dataframe(dataset)
     df.to_parquet(target, index=False)
 
     sidecar = target.with_suffix(target.suffix + ".meta.json")
@@ -615,6 +664,7 @@ def save_dataset_parquet(dataset: SoilDataset, path: str | Path) -> Path:
         "channel_ids": list(first_spec.channel_ids),
         "spectral_mode": first_spec.mode.value,
         "spectral_columns": wl_cols,
+        **({"custom_target_columns": custom_cols} if custom_cols else {}),
     }
     sidecar.write_text(json.dumps(sidecar_payload, indent=2), encoding="utf-8")
     return target
@@ -624,12 +674,14 @@ def load_dataset_parquet(
     path: str | Path,
     *,
     profile: InstrumentProfile | None = None,
+    target_columns: Sequence[str] | None = None,
 ) -> SoilDataset:
     """Load a SoilDataset from a Parquet file and its `.meta.json` sidecar."""
     pq_path = Path(path)
     sidecar = pq_path.with_suffix(pq_path.suffix + ".meta.json")
     df = pd.read_parquet(pq_path)
 
+    custom_cols: list[str] = list(target_columns or ())
     if sidecar.exists():
         meta = json.loads(sidecar.read_text(encoding="utf-8"))
         wl_grid = tuple(float(w) for w in meta["wavelength_grid_nm"])
@@ -638,6 +690,9 @@ def load_dataset_parquet(
         mode = SpectralSignalMode(meta.get("spectral_mode", "reflectance"))
         dataset_id = meta["manifest"]["dataset_id"]
         declared_source: DatasetSourceType = meta["manifest"]["dataset_source"]
+        for c in meta.get("custom_target_columns", []):
+            if c not in custom_cols:
+                custom_cols.append(c)
     elif profile is not None:
         wl_grid = profile.wavelength_grid_nm
         ch_ids = profile.channel_ids
@@ -658,4 +713,6 @@ def load_dataset_parquet(
         ch_ids=ch_ids,
         spec_cols=spec_cols,
         mode=mode,
+        target_columns=custom_cols,
+        instrument_profile=profile,
     )
