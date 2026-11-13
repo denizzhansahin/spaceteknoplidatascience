@@ -1,13 +1,13 @@
 {
   "manifest": {
-    "dataset_id": "stds_synth_20261113_024003_dry_pairs",
+    "dataset_id": "stds_synth_20261113_032733_dry_pairs",
     "dataset_source": "synthetic",
     "instrument_profile_id": "visnir_24ch_v1",
     "n_records": 20,
     "n_unique_samples": 20,
     "n_unique_sites": 8,
     "schema_version": "1.0.0",
-    "sha256_hash": "dc0940978afc9741474edbc98c3b6b6a0462f9159eb38d8738b013bb7cd49211",
+    "sha256_hash": "1015b3eb66afd14f38195790a46323e8c92014a0e28c72af7dc7df7fec6d487e",
     "created_utc": "2026-11-12T00:00:00Z",
     "description": "Paired dry calibration samples for EPO subspace estimation"
   },
@@ -1212,7 +1212,7 @@
         "unit": "cm"
       },
       "coordinates": {
-        "lat": 40.11875,
+        "lat": 39.9,
         "lon": 32.85,
         "crs_epsg": "EPSG:4326",
         "elevation_m": null
@@ -3572,7 +3572,7 @@
         "unit": "cm"
       },
       "coordinates": {
-        "lat": 40.11875,
+        "lat": 39.9,
         "lon": 32.85,
         "crs_epsg": "EPSG:4326",
         "elevation_m": null

@@ -1,23 +1,30 @@
 {
   "command": "train",
-  "artifact_dir": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/03_artifact_bundle",
+  "artifact_dir": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/03_artifact_bundle",
   "selected_model": "kernel_ridge_rbf",
-  "bundle_sha256": "cdd702b9f8993bd5033c9a580d6fe448a2f58dc2937d2c4acd52c593c50b95c0",
+  "target_names": [
+    "soc_pct",
+    "sic_pct",
+    "tc_pct"
+  ],
+  "suppression_mode": "epo",
+  "multi_target": true,
+  "bundle_sha256": "a5eaaa61502e67acf086859cc0c21d1af4e671f68753e7cf75de8363b3a5475b",
   "is_synthetic_smoke_only": true,
   "oof_metrics": {
     "n_samples": 80,
-    "mae": 0.1893104733975246,
-    "rmse": 0.2577455048586386,
-    "bias": -0.011703640157727449,
-    "r2": 0.9624817590542447,
-    "rpiq": 7.880712353022952,
-    "bland_altman_mean_diff": -0.011703640157727449,
-    "bland_altman_std_diff": 0.25910414324158326,
-    "bland_altman_loa_lower": -0.5195477609112306,
-    "bland_altman_loa_upper": 0.4961404805957757,
+    "mae": 0.4895168896982865,
+    "rmse": 0.608337815654125,
+    "bias": 0.028345524223334573,
+    "r2": 0.7793192006558386,
+    "rpiq": 2.9275942650729467,
+    "bland_altman_mean_diff": 0.028345524223334573,
+    "bland_altman_std_diff": 0.6115110392299453,
+    "bland_altman_loa_lower": -1.1702161126673583,
+    "bland_altman_loa_upper": 1.2269071611140274,
     "max_abs_closure_residual": null,
     "mean_abs_closure_residual": null
   },
-  "pdf_report_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/03_training_summary.pdf",
+  "pdf_report_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/03_training_summary.pdf",
   "lang": "tr"
 }

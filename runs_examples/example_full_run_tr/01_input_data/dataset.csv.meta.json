@@ -1,13 +1,13 @@
 {
   "manifest": {
-    "dataset_id": "stds_synth_20261113_023859",
+    "dataset_id": "stds_synth_20261113_032701",
     "dataset_source": "synthetic",
     "instrument_profile_id": "visnir_24ch_v1",
     "n_records": 80,
     "n_unique_samples": 80,
     "n_unique_sites": 8,
     "schema_version": "1.0.0",
-    "sha256_hash": "6aa7415909ae008f1540efc0e2184820e749596ae53e0c8e8f1cca6f783cd598",
+    "sha256_hash": "a7ed9146f7ead0aad6a9c3eb08defffe10929334672c74d0d6e915f834f70bfe",
     "created_utc": "2026-11-12T00:00:00Z",
     "description": "Physics-informed synthetic soil dataset (seed=42)"
   },

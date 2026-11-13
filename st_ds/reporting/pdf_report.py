@@ -184,15 +184,30 @@ def _render_table_section(
         )
         ax_tbl = fig.add_axes([0.04, 0.08, 0.92, 0.79])
         ax_tbl.axis("off")
+        n_cols = max(1, len(headers))
+        str_headers = [str(h) for h in headers]
+        str_chunk = [[str(c) for c in r] for r in chunk]
+        col_chars = [
+            max(
+                [len(str_headers[c])] + [len(r[c]) if c < len(r) else 0 for r in str_chunk] + [4]
+            )
+            for c in range(n_cols)
+        ]
+        raw_weights = [max(5.5, float(ch) + 2.2) for ch in col_chars]
+        total_weight = float(sum(raw_weights)) or 1.0
+        col_widths = [w / total_weight for w in raw_weights]
+
         tbl = ax_tbl.table(
-            cellText=[list(map(str, r)) for r in chunk],
-            colLabels=[str(h) for h in headers],
+            cellText=str_chunk,
+            colLabels=str_headers,
+            colWidths=col_widths,
             loc="upper center",
             cellLoc="center",
         )
         tbl.auto_set_font_size(False)
-        n_cols = max(1, len(headers))
-        tbl.set_fontsize(8.0 if n_cols <= 7 else (7.0 if n_cols <= 9 else 6.2))
+        total_chars = sum(col_chars)
+        font_sz = 6.2 if (total_chars > 120 or n_cols > 9) else (7.0 if (total_chars > 90 or n_cols > 7) else 8.0)
+        tbl.set_fontsize(font_sz)
         tbl.scale(1.0, 1.48)
         for (r_idx, _c_idx), cell in tbl.get_celld().items():
             cell.set_edgecolor("#CBD5E0")
@@ -235,7 +250,8 @@ def _summarize_arrays_for_lifecycle(
         valid = arr[np.isfinite(arr)]
         if valid.size == 0:
             return pick_text(lang, tr="ölçülmedi", en="absent")
-        return f"{float(np.min(valid)):.2f}–{float(np.max(valid)):.2f} (ort/mean {float(np.mean(valid)):.2f}){unit}"
+        avg_lbl = pick_text(lang, tr="ort", en="mean")
+        return f"{float(np.min(valid)):.2f}–{float(np.max(valid)):.2f} ({avg_lbl} {float(np.mean(valid)):.2f}){unit}"
 
     in_lines = [
         pick_text(lang, tr=f"• Veri Kimliği: {dataset.dataset_id} ({n_rec} ölçüm, {n_sites} saha)", en=f"• Dataset ID: {dataset.dataset_id} ({n_rec} records, {n_sites} sites)"),

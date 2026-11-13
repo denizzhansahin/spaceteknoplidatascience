@@ -2,13 +2,13 @@
   "artifact_format_version": "1.0.0",
   "schema_version": "1.0.0",
   "metadata": {
-    "artifact_id": "stds_kernel_ridge_rbf_stds_synth_20261113_024003",
+    "artifact_id": "stds_kernel_ridge_rbf_stds_synth_20261113_032733",
     "semantic_version": "0.1.0",
     "schema_version": "1.0.0",
     "instrument_profile_id": "visnir_24ch_v1",
     "calibration_id": "cal_synth_v2",
     "pipeline_version": "chem_v1",
-    "dataset_hash": "6aa7415909ae008f1540efc0e2184820e749596ae53e0c8e8f1cca6f783cd598",
+    "dataset_hash": "a7ed9146f7ead0aad6a9c3eb08defffe10929334672c74d0d6e915f834f70bfe",
     "dependency_versions": {
       "python": "3.13.9",
       "numpy": "2.2.6",
@@ -17,7 +17,7 @@
       "torch": "2.7.1",
       "safetensors": "0.5.3"
     },
-    "artifact_sha256": "3091208d3a90f99e2a7acf039732f304f4e7d55889bb54da3ef8f8a8ecc07bf1",
+    "artifact_sha256": "cb15da6acd0eea65805bb4171495bc05e683f1313e2dab43f9d2efd9fed21fa0",
     "code_commit": "uncommitted",
     "seed": 42,
     "created_utc": "2026-11-12T00:00:00Z"
@@ -139,11 +139,13 @@
     "class_name": "KernelRidgeRegressor",
     "model_name": "kernel_ridge_rbf",
     "model_family": "kernel_method",
-    "is_1d_target": true,
+    "is_1d_target": false,
     "n_features_in": 32,
-    "n_targets": 1,
+    "n_targets": 3,
     "target_names": [
-      "soc_pct"
+      "soc_pct",
+      "sic_pct",
+      "tc_pct"
     ],
     "clip_negative": true,
     "min_std": 0.0001,
@@ -186,7 +188,9 @@
       "model_name": "kernel_ridge_rbf",
       "model_family": "kernel_method",
       "target_names": [
-        "soc_pct"
+        "soc_pct",
+        "sic_pct",
+        "tc_pct"
       ],
       "clip_negative": true,
       "min_std": 0.0001,
@@ -205,11 +209,11 @@
       ],
       "inner_cv_folds": 5,
       "selected_alpha": 0.001,
-      "selected_sigma": 12.542191141773777
+      "selected_sigma": 26.034762035762228
     },
     "cho_lower": true,
     "selected_alpha": 0.001,
-    "selected_sigma": 12.542191141773777,
+    "selected_sigma": 26.034762035762228,
     "weight_format": "safetensors_numpy"
   },
   "weight_filename": "model_weights.safetensors",
@@ -222,8 +226,8 @@
       "sg_window": 7,
       "sg_polyorder": 2,
       "sg_deriv": 1,
-      "suppression_mode": "none",
-      "epo_q": null,
+      "suppression_mode": "epo",
+      "epo_q": 2,
       "epo_max_q": 6,
       "glsw_alpha": 0.1
     },
@@ -254,7 +258,14 @@
       2340.0,
       2520.0
     ],
-    "epo": null,
+    "epo": {
+      "n_bands": 24,
+      "q": 2,
+      "max_q": 6,
+      "variance_capture_threshold": 0.9,
+      "space_signature": "chem_v1:3e4515d175130722",
+      "calibration_dataset_hash": "untracked"
+    },
     "glsw": null,
     "fusion_config": {
       "covariate_names": [
@@ -526,25 +537,25 @@
         "fail_on_ood": false
       },
       "cho_lower": true,
-      "mahalanobis_threshold": 4.434413023631341,
-      "knn_threshold": 4.665203010436593,
+      "mahalanobis_threshold": 6.17885625535795,
+      "knn_threshold": 7.798520833122803,
       "domain_envelope": {
         "covariate_bounds": {
           "ph": [
-            5.682191382293381,
-            7.666159937020178
+            5.627175857622832,
+            7.890726366345921
           ],
           "moisture_volumetric_pct": [
-            2.9999607238463426,
-            35.43249138971515
+            2.6607838007398774,
+            35.32938311746674
           ],
           "temperature_c": [
-            13.38321619046726,
-            28.33849848160255
+            13.489384033953055,
+            28.168455237743924
           ],
           "ec_ds_m": [
-            0.336056415806907,
-            1.9998566674246647
+            0.31787380295941603,
+            2.0437270037509934
           ]
         },
         "seen_instrument_profiles": [
@@ -564,17 +575,17 @@
   },
   "files": {
     "model_weights.safetensors": {
-      "sha256": "c86586cb6d67498769bebe34e028081f5ba495ac691dbea6d2e949feac525883",
-      "size_bytes": 72624
+      "sha256": "745e2826dfe1fad1d63f5be946941961cf68f55babace82486ce92cf7b0c1ee8",
+      "size_bytes": 73920
     },
     "preprocess_state.npz": {
-      "sha256": "5af5eb6ef1f04142ef0d6ba27b0e37ebcb87a0731da825df4b6b0fc5b55dad09",
-      "size_bytes": 55140
+      "sha256": "e1787692b905c28d9960fd4f2621e37c4cd9c12f5bd28040c8a6687a1de86f8e",
+      "size_bytes": 66358
     },
     "model_card.json": {
-      "sha256": "f2b332e2ac285a28e10134cda2ab92dbf0de5b8ec3611899f6e4b34cbaf79def",
-      "size_bytes": 11954
+      "sha256": "11bebdab4e1c1ad91795d5096925c8468bef08f9ac5df15a05e4bc286ab6e6f3",
+      "size_bytes": 11956
     }
   },
-  "bundle_sha256": "3091208d3a90f99e2a7acf039732f304f4e7d55889bb54da3ef8f8a8ecc07bf1"
+  "bundle_sha256": "cb15da6acd0eea65805bb4171495bc05e683f1313e2dab43f9d2efd9fed21fa0"
 }

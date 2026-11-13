@@ -207,3 +207,126 @@ def test_scripts_syntax_and_gitignore_rules() -> None:
     assert "!.env\n" in gi
     assert "!.env.example\n" in gi
     assert "runs/\n" in gi
+    assert "!runs_examples/\n" in gi
+
+
+def test_cli_multitarget_epo_train_predict_and_audit(tmp_path: Path) -> None:
+    gen = SyntheticGeneratorV2(SyntheticConfig(dataset_id="mt_epo_v1", n_samples=24, n_sites=4, seed=42))
+    ds = gen.generate_dataset()
+    wet_ds, dry_ds = gen.generate_paired_wet_dry_dataset(n_pairs=10)
+
+    ds_path = tmp_path / "ds.json"
+    wet_path = tmp_path / "wet.json"
+    dry_path = tmp_path / "dry.json"
+    save_dataset_json(ds, ds_path)
+    save_dataset_json(wet_ds, wet_path)
+    save_dataset_json(dry_ds, dry_path)
+
+    bundle_dir = tmp_path / "bundle_mt_epo"
+    pred_path = tmp_path / "preds.json"
+    viz_dir = tmp_path / "viz_mt_epo"
+
+    env = dict(os.environ)
+    env["PYTHONPATH"] = str(REPO_ROOT)
+
+    p_train = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "st_ds.cli",
+            "train",
+            "--input",
+            str(ds_path),
+            "--output",
+            str(bundle_dir),
+            "--model",
+            "plsr",
+            "--target",
+            "soc_pct",
+            "--multi-target",
+            "--suppression-mode",
+            "epo",
+            "--epo-q",
+            "2",
+            "--wet",
+            str(wet_path),
+            "--dry",
+            str(dry_path),
+            "--folds",
+            "2",
+            "--lang",
+            "en",
+        ],
+        cwd=REPO_ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert p_train.returncode == 0, p_train.stderr
+
+    p_pred = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "st_ds.cli",
+            "predict",
+            "--artifact",
+            str(bundle_dir),
+            "--input",
+            str(ds_path),
+            "--output",
+            str(pred_path),
+        ],
+        cwd=REPO_ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert p_pred.returncode == 0, p_pred.stderr
+    pred_payload = json.loads(pred_path.read_text(encoding="utf-8"))
+    first_rep = pred_payload["results"][0]
+    cm = first_rep["carbon_metrics"]
+    assert cm["soc_pct"] is not None
+    assert cm["sic_pct"] is not None
+    assert cm["tc_pct"] is not None
+    assert cm["closure_residual_pct"] is not None
+
+    p_viz = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "st_ds.cli",
+            "visualize",
+            "--input",
+            str(ds_path),
+            "--artifact",
+            str(bundle_dir),
+            "--wet",
+            str(wet_path),
+            "--dry",
+            str(dry_path),
+            "--output",
+            str(viz_dir),
+            "--dpi",
+            "85",
+            "--no-interactive-3d",
+            "--lang",
+            "en",
+        ],
+        cwd=REPO_ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert p_viz.returncode == 0, p_viz.stderr
+    from st_ds.artifact.bundle import inspect_artifact
+
+    inspected = inspect_artifact(bundle_dir)
+    assert inspected["suppression_mode"] == "epo"
+    audit_csv = (viz_dir / "tables" / "05_tahmin_ve_stok_denetim_raporu.csv").read_text(encoding="utf-8")
+    assert "warning [synthetic]" in audit_csv
+    assert "- / -" not in audit_csv
+

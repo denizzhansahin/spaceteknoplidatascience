@@ -168,6 +168,8 @@ def _cmd_calibration_fit_epo(args: argparse.Namespace) -> int:
 
 def _cmd_train(args: argparse.Namespace) -> int:
     ds = _load_dataset_auto(args.input)
+    wet_ds = _load_dataset_auto(args.wet) if getattr(args, "wet", None) else None
+    dry_ds = _load_dataset_auto(args.dry) if getattr(args, "dry", None) else None
     pre_cfg = PreprocessConfig(suppression_mode=args.suppression_mode, epo_q=args.epo_q)
     trainer_cfg = TrainerConfig(
         target_name=args.target,
@@ -202,6 +204,8 @@ def _cmd_train(args: argparse.Namespace) -> int:
         split_folds=folds,
         model_factories=bench_factories,
         include_optional_models=True,
+        wet_dataset=wet_ds,
+        dry_dataset=dry_ds,
     )
     if args.model == "auto":
         chosen_key = bench.evidence_ranking[0]
@@ -209,29 +213,70 @@ def _cmd_train(args: argparse.Namespace) -> int:
     chosen_entry = bench.entries[chosen_key]
 
     # Fit final preprocessing + fusion + model + OOF conformal + OOD on full training set
-    chemo = _fit_fold_chemometrics(trainer_cfg, ds.records)
+    chemo = _fit_fold_chemometrics(
+        trainer_cfg,
+        ds.records,
+        external_wet=wet_ds,
+        external_dry=dry_ds,
+    )
     fusion = FeatureFusionPipeline(trainer_cfg.fusion_config).fit(ds.records, chemometric_pipeline=chemo)
     fused = fusion.build_feature_vector(ds.records, chemometric_pipeline=chemo)
 
     y_all = _extract_target_vector(ds.records, args.target)
+    final_target_names: tuple[str, ...] = (args.target,)
+    y_fit: np.ndarray = y_all
+
+    all_carbon_targets = ("soc_pct", "sic_pct", "tc_pct")
+    if getattr(args, "multi_target", False):
+        # Include all carbon fractions whose labels are completely finite in the training dataset
+        candidate_cols: list[tuple[str, np.ndarray]] = []
+        ordered_names = [args.target] + [t for t in all_carbon_targets if t != args.target]
+        for tname in ordered_names:
+            try:
+                vec = _extract_target_vector(ds.records, tname)
+                if np.all(np.isfinite(vec)):
+                    candidate_cols.append((tname, vec))
+            except Exception:
+                continue
+        if len(candidate_cols) >= 2:
+            final_target_names = tuple(name for name, _ in candidate_cols)
+            y_fit = np.column_stack([vec for _, vec in candidate_cols])
+
     final_model = factories[chosen_key](fused.X_spectral.shape[1])
     final_model.set_metadata(
         feature_names=fused.fused_feature_names,
-        target_names=(args.target,),
+        target_names=final_target_names,
         dataset_source=ds.dataset_source,
     )
     tr_groups = np.asarray([r.site_id for r in ds.records], dtype=str)
     if isinstance(final_model, STSoilHybridNetRegressor):
+        soc_vals = (
+            _extract_target_vector(ds.records, "soc_pct")
+            if "soc_pct" in final_target_names
+            else y_all
+        )
+        sic_vals = (
+            _extract_target_vector(ds.records, "sic_pct")
+            if "sic_pct" in final_target_names
+            else None
+        )
+        tc_vals = (
+            _extract_target_vector(ds.records, "tc_pct")
+            if "tc_pct" in final_target_names
+            else None
+        )
         final_model.fit_multitask(
             fused.X_spectral,
             fused.X_covariates,
-            soc=y_all,
+            soc=soc_vals,
+            sic=sic_vals,
+            tc=tc_vals,
         )
     elif hasattr(final_model, "fit"):
         try:
-            final_model.fit(fused.X_fused, y_all, groups=tr_groups)  # type: ignore[call-arg]
+            final_model.fit(fused.X_fused, y_fit, groups=tr_groups)  # type: ignore[call-arg]
         except TypeError:
-            final_model.fit(fused.X_fused, y_all)
+            final_model.fit(fused.X_fused, y_fit)
 
     conformal = None
     if len(ds.records) >= 5 and chosen_entry.oof_predictions.size == len(ds.records):
@@ -282,6 +327,9 @@ def _cmd_train(args: argparse.Namespace) -> int:
         "command": "train",
         "artifact_dir": str(out_dir),
         "selected_model": chosen_key,
+        "target_names": list(final_target_names),
+        "suppression_mode": pre_cfg.suppression_mode,
+        "multi_target": len(final_target_names) > 1,
         "bundle_sha256": inspected["bundle_sha256"],
         "is_synthetic_smoke_only": bench.is_synthetic_smoke_only,
         "oof_metrics": chosen_entry.oof_metrics.to_dict(),
@@ -298,7 +346,10 @@ def _cmd_train(args: argparse.Namespace) -> int:
 
 def _cmd_evaluate(args: argparse.Namespace) -> int:
     ds = _load_dataset_auto(args.input)
-    cfg = TrainerConfig(target_name=args.target, preprocess_config=PreprocessConfig(suppression_mode="none"), seed=args.seed)
+    wet_ds = _load_dataset_auto(args.wet) if getattr(args, "wet", None) else None
+    dry_ds = _load_dataset_auto(args.dry) if getattr(args, "dry", None) else None
+    pre_cfg = PreprocessConfig(suppression_mode=getattr(args, "suppression_mode", "none"), epo_q=getattr(args, "epo_q", None))
+    cfg = TrainerConfig(target_name=args.target, preprocess_config=pre_cfg, seed=args.seed)
     trainer = STSoilTrainer(cfg)
     n_sites = len(ds.unique_site_ids)
     folds = GroupedSplitBuilder.group_kfold_split(
@@ -310,6 +361,8 @@ def _cmd_evaluate(args: argparse.Namespace) -> int:
         ds,
         split_folds=folds,
         include_optional_models=bool(args.include_optional),
+        wet_dataset=wet_ds,
+        dry_dataset=dry_ds,
     )
     payload = bench.to_dict()
     _emit_json(payload, args.output)
@@ -514,6 +567,9 @@ def build_parser() -> argparse.ArgumentParser:
     p_train.add_argument("--seed", type=int, default=42)
     p_train.add_argument("--suppression-mode", default="none", choices=["none", "epo", "glsw"])
     p_train.add_argument("--epo-q", type=int, default=None)
+    p_train.add_argument("--wet", default=None, help="Optional paired wet calibration SoilDataset for EPO/GLSW.")
+    p_train.add_argument("--dry", default=None, help="Optional paired dry calibration SoilDataset for EPO/GLSW.")
+    p_train.add_argument("--multi-target", action="store_true", help="Jointly train all available carbon fractions (soc_pct, sic_pct, tc_pct).")
     p_train.add_argument("--hybrid-epochs", type=int, default=35)
     p_train.add_argument("--artifact-id", default=None)
     p_train.add_argument("--semantic-version", default="0.1.0")
@@ -527,6 +583,10 @@ def build_parser() -> argparse.ArgumentParser:
     p_eval.add_argument("--target", default="soc_pct", choices=["soc_pct", "sic_pct", "tc_pct"])
     p_eval.add_argument("--folds", type=int, default=3)
     p_eval.add_argument("--seed", type=int, default=42)
+    p_eval.add_argument("--suppression-mode", default="none", choices=["none", "epo", "glsw"])
+    p_eval.add_argument("--epo-q", type=int, default=None)
+    p_eval.add_argument("--wet", default=None, help="Optional paired wet calibration SoilDataset.")
+    p_eval.add_argument("--dry", default=None, help="Optional paired dry calibration SoilDataset.")
     p_eval.add_argument("--include-optional", action="store_true")
     p_eval.add_argument("--output", default=None, help="Optional benchmark report JSON output.")
     p_eval.set_defaults(func=_cmd_evaluate)

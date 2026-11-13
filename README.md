@@ -204,6 +204,7 @@ st-ds visualize [--lang]   ──► 26+ 2D/3D PNG, 5 CSV/MD tablo, index.html &
 | Rehber | Hedef Okuyucu | Kapsadığı İçerik |
 | --- | --- | --- |
 | **[Toprak Analizi Kılavuzu — TR & EN](docs/TOPRAK_ANALIZ.md)** | Toprak bilimcileri / Ziraat mühendisleri / Uluslararası ekipler | Toprak örneklemesi, spektral bant kimyası, nem/karbonat/stok kuramı ve **Türkçe + İngilizce** birebir kullanım. |
+| **[Toprak Dışı & Genel Veri Analizi — TR & EN](docs/GENERAL_DATA_ANALYSIS_GUIDE.md)** | Agronomi / Madencilik / Su Kalitesi / Genel Tabular & Sensör ekipleri | %80 alan-bağımsız motorun yaprak azotu, mineraloji, su UV-Vis ve genel çok-sensörlü verilerde **TR & EN** kullanımı. |
 | **[Örnek Tam Çalıştırma Çıktıları (`runs_examples/`)](runs_examples/README.md)** | GitHub üzerinden inceleyen herkes | Çalıştırmadan önce inceleyebileceğiniz hazır **TR & EN** tam PDF raporları (`00_STDS_FULL_ANALYSIS_REPORT.pdf`), 26 PNG, 5 CSV/MD ve `index.html`. |
 | **[İlk Kurulum ve Adım Adım Yol Haritası](docs/FIRST_TIME_ROADMAP_GUIDE.md)** | Sistemi ilk kez kuran geliştirici / araştırmacı | Sıfırdan kurulum, `.env` dil seçimi, veri hazırlama, `scripts/` ile çalıştırma ve PDF/PNG çıktı okuma. |
 | **[Akademik Metodoloji ve Algoritmalar Makalesi](docs/ACADEMIC_METHODOLOGY_AND_ALGORITHMS.md)** | Veri bilimciler / Araştırmacılar / Hakemler | %90 bilimsel/matematiksel problem-çözüm kuramı, formüller ve %10 `st_ds.*` modül ilişkisi. |

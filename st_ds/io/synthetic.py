@@ -147,6 +147,8 @@ class SyntheticGeneratorV2:
         coarse_fragments: float,
         baseline_offset: float,
         baseline_slope: float,
+        lat: float = 39.90,
+        lon: float = 32.85,
         replicate_id: str = "rep_1",
     ) -> Measurement:
         wl_nm = np.asarray(self.profile.wavelength_grid_nm, dtype=float)
@@ -224,7 +226,7 @@ class SyntheticGeneratorV2:
             soil_texture_class="loam" if clay_fraction < 0.35 else "clay_loam",
             moisture_scenario=moisture_scenario,
             depth_interval=DepthInterval(0.0, 30.0),
-            coordinates=SpatialCoordinates(lat=39.90 + 0.01 * hash(site_id) % 0.5, lon=32.85),
+            coordinates=SpatialCoordinates(lat=float(lat), lon=float(lon), crs_epsg="EPSG:4326"),
             spectrum=spectrum,
             covariates=covariates,
             reference=reference,
@@ -236,14 +238,30 @@ class SyntheticGeneratorV2:
         rng = np.random.default_rng(self.config.seed)
         records: list[Measurement] = []
         sites = [f"site_{i + 1:02d}" for i in range(self.config.n_sites)]
+        n_cols = max(2, int(np.ceil(np.sqrt(max(2, len(sites))))))
+        n_rows = max(2, int(np.ceil(len(sites) / n_cols)))
 
         for idx in range(self.config.n_samples):
-            site_id = sites[idx % len(sites)]
-            sample_id = f"SYN_{idx + 1:04d}"
-            # Site-dependent baseline soil chemistry + sample variation
             site_idx = idx % len(sites)
-            soc_pct = float(np.clip(rng.uniform(0.3, 4.8) + 0.15 * site_idx, 0.2, 6.0))
-            sic_pct = float(np.clip(rng.uniform(0.05, 3.8) + 0.10 * (len(sites) - site_idx), 0.0, 5.5))
+            site_id = sites[site_idx]
+            sample_id = f"SYN_{idx + 1:04d}"
+
+            # Deterministic 2D field grid + intra-site plot offset (non-collinear for Kriging)
+            grid_c = site_idx % n_cols
+            grid_r = site_idx // n_cols
+            base_lon = 32.78 + (grid_c / max(1, n_cols - 1)) * 0.14
+            base_lat = 39.84 + (grid_r / max(1, n_rows - 1)) * 0.12
+            lon_val = float(base_lon + rng.uniform(-0.014, 0.014))
+            lat_val = float(base_lat + rng.uniform(-0.012, 0.012))
+
+            # Mild 2D spatial gradient + site chemistry so Semivariogram & Kriging reveal coherent structure
+            dx_n = (lon_val - 32.85) / 0.07
+            dy_n = (lat_val - 39.90) / 0.06
+            spatial_soc_shift = 0.65 * np.sin(1.8 * dx_n) * np.cos(1.5 * dy_n) + 0.35 * dx_n
+            spatial_sic_shift = 0.40 * np.cos(1.4 * dx_n + 0.7 * dy_n)
+
+            soc_pct = float(np.clip(rng.uniform(0.5, 4.4) + 0.14 * site_idx + spatial_soc_shift, 0.2, 6.2))
+            sic_pct = float(np.clip(rng.uniform(0.2, 3.6) + 0.08 * (len(sites) - site_idx) + spatial_sic_shift, 0.05, 5.5))
             moisture_vol = float(rng.uniform(4.0, 34.0))
             clay_frac = float(rng.uniform(0.12, 0.55))
             ph = float(np.clip(6.2 + 0.38 * sic_pct - 0.12 * soc_pct + rng.normal(0.0, 0.15), 4.5, 8.8))
@@ -279,6 +297,8 @@ class SyntheticGeneratorV2:
                     coarse_fragments=coarse_frac,
                     baseline_offset=base_offset,
                     baseline_slope=base_slope,
+                    lat=lat_val,
+                    lon=lon_val,
                 )
             )
 

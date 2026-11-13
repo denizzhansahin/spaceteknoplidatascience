@@ -79,6 +79,8 @@ if [[ -z "$INPUT_ARG" ]]; then
   DRY_ARG="$RUN_DIR/01_input_data/dry_pairs.json"
 else
   INPUT_PATH="$INPUT_ARG"
+  WET_ARG="${WET_PATH:-}"
+  DRY_ARG="${DRY_PATH:-}"
   mkdir -p "$RUN_DIR/01_input_data"
   cp "$INPUT_PATH" "$RUN_DIR/01_input_data/" 2>/dev/null || true
   echo "[1/6] Kullanıcı verisi kullanılıyor: $INPUT_PATH"
@@ -87,6 +89,16 @@ fi
 PROFILE_FLAGS=()
 if [[ -n "$PROFILE_ARG" ]]; then
   PROFILE_FLAGS=(--instrument-profile "$PROFILE_ARG")
+fi
+
+EPO_TRAIN_FLAGS=()
+if [[ -n "$WET_ARG" && -f "$WET_ARG" && -n "$DRY_ARG" && -f "$DRY_ARG" ]]; then
+  EPO_TRAIN_FLAGS=(--suppression-mode epo --epo-q 2 --wet "$WET_ARG" --dry "$DRY_ARG")
+fi
+
+MULTI_TARGET_FLAG=()
+if [[ "${MULTI_TARGET:-1}" != "0" ]]; then
+  MULTI_TARGET_FLAG=(--multi-target)
 fi
 
 # AŞAMA 2 — Veri Şeması ve Fiziksel Kısıt Doğrulaması
@@ -105,6 +117,8 @@ PYTHONPATH="$REPO_ROOT" "$RESOLVED_PYTHON" -m st_ds.cli train \
   --model auto \
   --target "$TARGET" \
   --folds "$FOLDS" \
+  ${EPO_TRAIN_FLAGS[@]+"${EPO_TRAIN_FLAGS[@]}"} \
+  ${MULTI_TARGET_FLAG[@]+"${MULTI_TARGET_FLAG[@]}"} \
   --hybrid-epochs "$EPOCHS" \
   --seed "$SEED" \
   --lang "$ACTIVE_LANG" \

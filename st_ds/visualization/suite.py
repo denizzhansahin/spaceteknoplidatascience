@@ -95,6 +95,8 @@ def _run_benchmark_if_feasible(
     dataset: SoilDataset,
     *,
     config: VisualizationConfig,
+    wet_dataset: SoilDataset | None = None,
+    dry_dataset: SoilDataset | None = None,
 ) -> BenchmarkReport | None:
     """Run grouped cross-validation benchmark when sufficient sites and finite labels exist."""
     n_sites = len(dataset.unique_site_ids)
@@ -107,9 +109,18 @@ def _run_benchmark_if_feasible(
     if not np.all(np.isfinite(y_vals)):
         return None
 
+    has_epo_pairs = (
+        wet_dataset is not None
+        and dry_dataset is not None
+        and len(wet_dataset.records) > 0
+        and len(dry_dataset.records) > 0
+    )
     t_cfg = TrainerConfig(
         target_name=config.target_name,
-        preprocess_config=PreprocessConfig(suppression_mode="none"),
+        preprocess_config=PreprocessConfig(
+            suppression_mode="epo" if has_epo_pairs else "none",
+            epo_q=2,
+        ),
         hybrid_epochs=25,
         seed=config.seed,
     )
@@ -123,6 +134,8 @@ def _run_benchmark_if_feasible(
         dataset,
         split_folds=folds,
         include_optional_models=config.include_optional_models,
+        wet_dataset=wet_dataset,
+        dry_dataset=dry_dataset,
     )
 
 
@@ -151,6 +164,17 @@ def _build_in_memory_analyzer(
     fusion = FeatureFusionPipeline(t_cfg.fusion_config).fit(dataset.records, chemometric_pipeline=chemo)
     fused = fusion.build_feature_vector(dataset.records, chemometric_pipeline=chemo)
     y_all = _extract_target_vector(dataset.records, config.target_name)
+    has_multitarget = (
+        config.target_name == "soc_pct"
+        and all(
+            r.reference is not None
+            and r.reference.soc_pct is not None
+            and r.reference.sic_pct is not None
+            and r.reference.tc_pct is not None
+            for r in dataset.records
+        )
+    )
+    target_names: tuple[str, ...] = ("soc_pct", "sic_pct", "tc_pct") if has_multitarget else (config.target_name,)
 
     trainer = STSoilTrainer(t_cfg)
     factories = trainer.default_model_factories(include_optional=True)
@@ -161,17 +185,32 @@ def _build_in_memory_analyzer(
     model = factories[chosen_key](fused.X_spectral.shape[1])
     model.set_metadata(
         feature_names=fused.fused_feature_names,
-        target_names=(config.target_name,),
+        target_names=target_names,
         dataset_source=dataset.dataset_source,
     )
     groups = np.asarray([r.site_id for r in dataset.records], dtype=str)
     if isinstance(model, STSoilHybridNetRegressor):
-        model.fit_multitask(fused.X_spectral, fused.X_covariates, soc=y_all)
+        if has_multitarget:
+            y_sic = np.asarray([float(r.reference.sic_pct) for r in dataset.records], dtype=float)
+            y_tc = np.asarray([float(r.reference.tc_pct) for r in dataset.records], dtype=float)
+            model.fit_multitask(fused.X_spectral, fused.X_covariates, soc=y_all, sic=y_sic, tc=y_tc)
+        else:
+            model.fit_multitask(fused.X_spectral, fused.X_covariates, soc=y_all)
     else:
+        if has_multitarget:
+            y_fit = np.column_stack(
+                [
+                    y_all,
+                    np.asarray([float(r.reference.sic_pct) for r in dataset.records], dtype=float),
+                    np.asarray([float(r.reference.tc_pct) for r in dataset.records], dtype=float),
+                ]
+            )
+        else:
+            y_fit = y_all
         try:
-            model.fit(fused.X_fused, y_all, groups=groups)  # type: ignore[call-arg]
+            model.fit(fused.X_fused, y_fit, groups=groups)  # type: ignore[call-arg]
         except TypeError:
-            model.fit(fused.X_fused, y_all)
+            model.fit(fused.X_fused, y_fit)
 
     conformal = None
     if benchmark is not None and chosen_key in benchmark.entries:
@@ -184,10 +223,16 @@ def _build_in_memory_analyzer(
             )
     if conformal is None and len(dataset.records) >= 5:
         preds, stds = model.predict_distribution(fused.X_fused)
+        preds_1d = np.asarray(preds, dtype=float)
+        stds_1d = np.asarray(stds, dtype=float)
+        if preds_1d.ndim == 2:
+            preds_1d = preds_1d[:, 0]
+        if stds_1d.ndim == 2:
+            stds_1d = stds_1d[:, 0]
         conformal = ConformalUncertaintyCalibrator(ConformalConfig()).fit(
             y_all,
-            np.asarray(preds, dtype=float).reshape(-1),
-            pred_std_cal=np.asarray(stds, dtype=float).reshape(-1),
+            preds_1d.reshape(-1),
+            pred_std_cal=stds_1d.reshape(-1),
         )
 
     ood = OutOfDomainDetector(OODConfig()).fit(fused.X_fused, measurements=dataset.records)
@@ -286,7 +331,12 @@ def generate_full_visualization_suite(
     arrays: DatasetArrays = extract_dataset_arrays(dataset)
 
     if benchmark is None:
-        benchmark = _run_benchmark_if_feasible(dataset, config=cfg)
+        benchmark = _run_benchmark_if_feasible(
+        dataset,
+        config=cfg,
+        wet_dataset=wet_dataset,
+        dry_dataset=dry_dataset,
+    )
 
     if analyzer is None:
         if artifact_path is not None:

@@ -240,6 +240,7 @@ Hedef sahada/edge cihazda internet erişimi olmadan kurulum yapmak için önce w
 ## 7. İlgili Dokümantasyon
 
 - **Toprak Analizi Çift Dilli (TR & EN) Bilimsel & Uygulama Rehberi:** [TOPRAK_ANALIZ.md](TOPRAK_ANALIZ.md)
+- **Toprak Dışı & Genel Spektral / Çok-Sensörlü Veri Analizi Rehberi (TR & EN):** [GENERAL_DATA_ANALYSIS_GUIDE.md](GENERAL_DATA_ANALYSIS_GUIDE.md)
 - **Akademik Metodoloji ve Matematiksel Formülasyon (%90 Bilimsel / %10 Yazılım İlişkisi):** [ACADEMIC_METHODOLOGY_AND_ALGORITHMS.md](ACADEMIC_METHODOLOGY_AND_ALGORITHMS.md)
 - **Sıfırdan Kurulum ve Adım Adım Kullanım Yol Haritası:** [FIRST_TIME_ROADMAP_GUIDE.md](FIRST_TIME_ROADMAP_GUIDE.md)
 - **İlk Sentetik Test Rehberi:** [SYNTHETIC_TESTING_GUIDE.md](SYNTHETIC_TESTING_GUIDE.md)

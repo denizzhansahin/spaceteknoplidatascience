@@ -2,83 +2,83 @@
 
 | Örnek ID | Saha | Tahmin (%) | %90 CI Aralığı | SIC / TC (%) | Stok (Mg/ha) | Baskın Belirsizlik | OOD Skoru | Durum |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| SYN_0001 | site_01 | 3.780 | [3.33, 4.23] | - / - | 125.2 | bulk_density | 0.62 | warning |
-| SYN_0002 | site_02 | 1.227 | [0.78, 1.67] | - / - | 45.4 | carbon_pct | 0.70 | warning |
-| SYN_0003 | site_03 | 1.590 | [1.14, 2.04] | - / - | 64.2 | bulk_density | 0.52 | warning |
-| SYN_0004 | site_04 | 4.137 | [3.69, 4.58] | - / - | 155.2 | bulk_density | 0.56 | warning |
-| SYN_0005 | site_05 | 3.148 | [2.70, 3.60] | - / - | 116.9 | bulk_density | 0.61 | warning |
-| SYN_0006 | site_06 | 3.015 | [2.57, 3.46] | - / - | 110.4 | bulk_density | 0.72 | warning |
-| SYN_0007 | site_07 | 2.105 | [1.66, 2.55] | - / - | 71.8 | bulk_density | 0.56 | warning |
-| SYN_0008 | site_08 | 4.385 | [3.94, 4.83] | - / - | 134.8 | bulk_density | 0.60 | warning |
-| SYN_0009 | site_01 | 0.510 | [0.06, 0.96] | - / - | 19.2 | carbon_pct | 0.68 | warning |
-| SYN_0010 | site_02 | 2.539 | [2.09, 2.99] | - / - | 91.9 | bulk_density | 0.65 | warning |
-| SYN_0011 | site_03 | 2.750 | [2.30, 3.20] | - / - | 96.2 | bulk_density | 0.63 | warning |
-| SYN_0012 | site_04 | 3.689 | [3.24, 4.14] | - / - | 133.4 | bulk_density | 0.86 | warning |
-| SYN_0013 | site_05 | 5.113 | [4.67, 5.56] | - / - | 169.1 | bulk_density | 0.68 | warning |
-| SYN_0014 | site_06 | 4.052 | [3.60, 4.50] | - / - | 154.4 | bulk_density | 0.61 | warning |
-| SYN_0015 | site_07 | 5.172 | [4.72, 5.62] | - / - | 159.7 | bulk_density | 0.55 | warning |
-| SYN_0016 | site_08 | 3.679 | [3.23, 4.13] | - / - | 119.3 | bulk_density | 0.76 | warning |
-| SYN_0017 | site_01 | 4.068 | [3.62, 4.52] | - / - | 133.0 | bulk_density | 0.55 | warning |
-| SYN_0018 | site_02 | 4.301 | [3.85, 4.75] | - / - | 132.6 | bulk_density | 0.56 | warning |
-| SYN_0019 | site_03 | 4.103 | [3.66, 4.55] | - / - | 143.1 | bulk_density | 0.67 | warning |
-| SYN_0020 | site_04 | 1.405 | [0.96, 1.85] | - / - | 53.2 | carbon_pct | 0.79 | warning |
-| SYN_0021 | site_05 | 3.448 | [3.00, 3.90] | - / - | 133.2 | bulk_density | 0.53 | warning |
-| SYN_0022 | site_06 | 2.543 | [2.10, 2.99] | - / - | 83.2 | bulk_density | 0.59 | warning |
-| SYN_0023 | site_07 | 4.865 | [4.42, 5.31] | - / - | 170.9 | bulk_density | 0.61 | warning |
-| SYN_0024 | site_08 | 4.006 | [3.56, 4.45] | - / - | 148.1 | bulk_density | 0.44 | warning |
-| SYN_0025 | site_01 | 1.935 | [1.49, 2.38] | - / - | 79.0 | bulk_density | 0.42 | warning |
-| SYN_0026 | site_02 | 0.979 | [0.53, 1.43] | - / - | 39.1 | carbon_pct | 0.72 | warning |
-| SYN_0027 | site_03 | 3.220 | [2.77, 3.67] | - / - | 107.3 | bulk_density | 0.56 | warning |
-| SYN_0028 | site_04 | 5.067 | [4.62, 5.51] | - / - | 181.9 | bulk_density | 0.68 | warning |
-| SYN_0029 | site_05 | 2.153 | [1.71, 2.60] | - / - | 81.5 | bulk_density | 0.75 | warning |
-| SYN_0030 | site_06 | 2.571 | [2.12, 3.02] | - / - | 93.4 | bulk_density | 0.77 | warning |
-| SYN_0031 | site_07 | 4.018 | [3.57, 4.47] | - / - | 137.5 | bulk_density | 0.62 | warning |
-| SYN_0032 | site_08 | 1.825 | [1.38, 2.27] | - / - | 71.1 | bulk_density | 0.61 | warning |
-| SYN_0033 | site_01 | 4.105 | [3.66, 4.55] | - / - | 143.5 | bulk_density | 0.66 | warning |
-| SYN_0034 | site_02 | 2.133 | [1.69, 2.58] | - / - | 89.7 | bulk_density | 0.78 | warning |
-| SYN_0035 | site_03 | 3.160 | [2.71, 3.61] | - / - | 110.2 | bulk_density | 0.60 | warning |
-| SYN_0036 | site_04 | 1.702 | [1.25, 2.15] | - / - | 66.6 | bulk_density | 0.63 | warning |
-| SYN_0037 | site_05 | 4.946 | [4.50, 5.39] | - / - | 160.9 | bulk_density | 0.59 | warning |
-| SYN_0038 | site_06 | 4.943 | [4.50, 5.39] | - / - | 154.5 | bulk_density | 0.67 | warning |
-| SYN_0039 | site_07 | 1.278 | [0.83, 1.73] | - / - | 52.2 | carbon_pct | 0.55 | warning |
-| SYN_0040 | site_08 | 5.427 | [4.98, 5.87] | - / - | 170.9 | bulk_density | 0.84 | warning |
-| SYN_0041 | site_01 | 2.033 | [1.59, 2.48] | - / - | 76.6 | bulk_density | 0.90 | warning |
-| SYN_0042 | site_02 | 3.873 | [3.43, 4.32] | - / - | 140.2 | bulk_density | 0.52 | warning |
-| SYN_0043 | site_03 | 3.481 | [3.03, 3.93] | - / - | 113.0 | bulk_density | 0.53 | warning |
-| SYN_0044 | site_04 | 2.106 | [1.66, 2.55] | - / - | 76.5 | bulk_density | 0.72 | warning |
-| SYN_0045 | site_05 | 3.338 | [2.89, 3.79] | - / - | 116.3 | bulk_density | 0.83 | warning |
-| SYN_0046 | site_06 | 5.100 | [4.65, 5.55] | - / - | 153.4 | bulk_density | 0.76 | warning |
-| SYN_0047 | site_07 | 3.124 | [2.68, 3.57] | - / - | 119.2 | bulk_density | 0.52 | warning |
-| SYN_0048 | site_08 | 2.733 | [2.29, 3.18] | - / - | 96.0 | bulk_density | 0.61 | warning |
-| SYN_0049 | site_01 | 0.723 | [0.28, 1.17] | - / - | 26.4 | carbon_pct | 0.67 | warning |
-| SYN_0050 | site_02 | 4.665 | [4.22, 5.11] | - / - | 163.3 | bulk_density | 0.57 | warning |
-| SYN_0051 | site_03 | 2.232 | [1.78, 2.68] | - / - | 86.4 | bulk_density | 0.73 | warning |
-| SYN_0052 | site_04 | 1.745 | [1.30, 2.19] | - / - | 63.1 | bulk_density | 0.59 | warning |
-| SYN_0053 | site_05 | 2.756 | [2.31, 3.20] | - / - | 88.5 | bulk_density | 0.71 | warning |
-| SYN_0054 | site_06 | 4.395 | [3.95, 4.84] | - / - | 152.0 | bulk_density | 0.72 | warning |
-| SYN_0055 | site_07 | 3.962 | [3.51, 4.41] | - / - | 153.8 | bulk_density | 0.72 | warning |
-| SYN_0056 | site_08 | 5.660 | [5.21, 6.11] | - / - | 172.3 | bulk_density | 0.74 | warning |
-| SYN_0057 | site_01 | 4.590 | [4.14, 5.04] | - / - | 156.2 | bulk_density | 0.75 | warning |
-| SYN_0058 | site_02 | 1.557 | [1.11, 2.00] | - / - | 59.8 | bulk_density | 0.51 | warning |
-| SYN_0059 | site_03 | 1.178 | [0.73, 1.63] | - / - | 47.6 | carbon_pct | 0.76 | warning |
-| SYN_0060 | site_04 | 1.641 | [1.19, 2.09] | - / - | 67.5 | bulk_density | 0.69 | warning |
-| SYN_0061 | site_05 | 1.066 | [0.62, 1.51] | - / - | 42.8 | carbon_pct | 0.65 | warning |
-| SYN_0062 | site_06 | 4.987 | [4.54, 5.43] | - / - | 168.1 | bulk_density | 0.56 | warning |
-| SYN_0063 | site_07 | 4.223 | [3.78, 4.67] | - / - | 139.7 | bulk_density | 0.64 | warning |
-| SYN_0064 | site_08 | 1.974 | [1.53, 2.42] | - / - | 78.3 | bulk_density | 0.75 | warning |
-| SYN_0065 | site_01 | 3.039 | [2.59, 3.49] | - / - | 118.9 | bulk_density | 0.50 | warning |
-| SYN_0066 | site_02 | 2.871 | [2.42, 3.32] | - / - | 110.2 | bulk_density | 0.70 | warning |
-| SYN_0067 | site_03 | 0.912 | [0.47, 1.36] | - / - | 33.6 | carbon_pct | 0.85 | warning |
-| SYN_0068 | site_04 | 4.558 | [4.11, 5.01] | - / - | 163.2 | bulk_density | 0.63 | warning |
-| SYN_0069 | site_05 | 5.307 | [4.86, 5.75] | - / - | 176.5 | bulk_density | 0.57 | warning |
-| SYN_0070 | site_06 | 1.321 | [0.87, 1.77] | - / - | 49.4 | carbon_pct | 0.61 | warning |
-| SYN_0071 | site_07 | 2.687 | [2.24, 3.13] | - / - | 97.8 | bulk_density | 0.57 | warning |
-| SYN_0072 | site_08 | 3.673 | [3.23, 4.12] | - / - | 118.2 | bulk_density | 0.59 | warning |
-| SYN_0073 | site_01 | 3.560 | [3.11, 4.01] | - / - | 123.8 | bulk_density | 0.53 | warning |
-| SYN_0074 | site_02 | 3.590 | [3.14, 4.04] | - / - | 117.3 | bulk_density | 0.54 | warning |
-| SYN_0075 | site_03 | 2.195 | [1.75, 2.64] | - / - | 79.2 | bulk_density | 0.78 | warning |
-| SYN_0076 | site_04 | 2.548 | [2.10, 3.00] | - / - | 95.8 | bulk_density | 0.67 | warning |
-| SYN_0077 | site_05 | 4.686 | [4.24, 5.13] | - / - | 166.0 | bulk_density | 0.57 | warning |
-| SYN_0078 | site_06 | 3.149 | [2.70, 3.60] | - / - | 104.9 | bulk_density | 0.66 | warning |
-| SYN_0079 | site_07 | 1.947 | [1.50, 2.39] | - / - | 72.5 | bulk_density | 0.58 | warning |
-| SYN_0080 | site_08 | 2.352 | [1.91, 2.80] | - / - | 81.6 | bulk_density | 0.58 | warning |
+| SYN_0001 | site_01 | 2.841 | [1.92, 3.76] | 2.62 / 5.47 | 112.8 | carbon_pct | 0.50 | uyarı [sentetik] |
+| SYN_0002 | site_02 | 3.959 | [3.04, 4.88] | 2.72 / 6.68 | 134.0 | bulk_density | 0.44 | uyarı [sentetik] |
+| SYN_0003 | site_03 | 1.832 | [0.91, 2.76] | 3.38 / 5.21 | 64.0 | carbon_pct | 0.40 | uyarı [sentetik] |
+| SYN_0004 | site_04 | 1.909 | [0.99, 2.83] | 1.08 / 2.99 | 69.8 | carbon_pct | 0.57 | uyarı [sentetik] |
+| SYN_0005 | site_05 | 4.275 | [3.35, 5.20] | 3.42 / 7.70 | 162.9 | bulk_density | 0.54 | uyarı [sentetik] |
+| SYN_0006 | site_06 | 2.222 | [1.30, 3.14] | 2.82 / 5.04 | 75.9 | carbon_pct | 0.55 | uyarı [sentetik] |
+| SYN_0007 | site_07 | 1.586 | [0.66, 2.51] | 2.55 / 4.13 | 55.0 | carbon_pct | 0.53 | uyarı [sentetik] |
+| SYN_0008 | site_08 | 3.545 | [2.62, 4.47] | 1.45 / 5.00 | 149.0 | carbon_pct | 0.60 | uyarı [sentetik] |
+| SYN_0009 | site_01 | 1.756 | [0.83, 2.68] | 2.92 / 4.67 | 74.1 | carbon_pct | 0.54 | uyarı [sentetik] |
+| SYN_0010 | site_02 | 3.577 | [2.65, 4.50] | 3.31 / 6.89 | 127.1 | carbon_pct | 0.46 | uyarı [sentetik] |
+| SYN_0011 | site_03 | 5.233 | [4.31, 6.16] | 3.81 / 9.05 | 168.1 | bulk_density | 0.60 | uyarı [sentetik] |
+| SYN_0012 | site_04 | 2.712 | [1.79, 3.64] | 0.68 / 3.39 | 105.4 | carbon_pct | 0.84 | uyarı [sentetik] |
+| SYN_0013 | site_05 | 3.696 | [2.77, 4.62] | 1.64 / 5.33 | 129.1 | carbon_pct | 0.60 | uyarı [sentetik] |
+| SYN_0014 | site_06 | 4.160 | [3.24, 5.08] | 1.36 / 5.52 | 137.0 | bulk_density | 0.46 | uyarı [sentetik] |
+| SYN_0015 | site_07 | 3.309 | [2.39, 4.23] | 1.20 / 4.51 | 111.9 | carbon_pct | 0.61 | uyarı [sentetik] |
+| SYN_0016 | site_08 | 3.744 | [2.82, 4.67] | 2.91 / 6.66 | 129.5 | bulk_density | 0.46 | uyarı [sentetik] |
+| SYN_0017 | site_01 | 2.268 | [1.35, 3.19] | 2.74 / 5.01 | 77.0 | carbon_pct | 0.44 | uyarı [sentetik] |
+| SYN_0018 | site_02 | 2.934 | [2.01, 3.86] | 3.48 / 6.41 | 120.8 | carbon_pct | 0.60 | uyarı [sentetik] |
+| SYN_0019 | site_03 | 2.742 | [1.82, 3.67] | 3.93 / 6.67 | 108.9 | carbon_pct | 0.62 | uyarı [sentetik] |
+| SYN_0020 | site_04 | 0.851 | [0.00, 1.77] | 0.66 / 1.51 | 38.2 | carbon_pct | 0.65 | uyarı [sentetik] |
+| SYN_0021 | site_05 | 1.028 | [0.11, 1.95] | 3.91 / 4.93 | 40.6 | carbon_pct | 0.71 | uyarı [sentetik] |
+| SYN_0022 | site_06 | 5.128 | [4.20, 6.05] | 1.68 / 6.81 | 162.3 | bulk_density | 0.65 | uyarı [sentetik] |
+| SYN_0023 | site_07 | 5.055 | [4.13, 5.98] | 2.19 / 7.24 | 173.7 | bulk_density | 0.63 | uyarı [sentetik] |
+| SYN_0024 | site_08 | 3.394 | [2.47, 4.32] | 1.73 / 5.13 | 114.6 | carbon_pct | 0.35 | uyarı [sentetik] |
+| SYN_0025 | site_01 | 3.626 | [2.70, 4.55] | 3.86 / 7.49 | 119.4 | bulk_density | 0.53 | uyarı [sentetik] |
+| SYN_0026 | site_02 | 2.720 | [1.80, 3.64] | 2.01 / 4.73 | 99.3 | carbon_pct | 0.72 | uyarı [sentetik] |
+| SYN_0027 | site_03 | 1.636 | [0.71, 2.56] | 2.33 / 3.97 | 66.8 | carbon_pct | 0.54 | uyarı [sentetik] |
+| SYN_0028 | site_04 | 4.193 | [3.27, 5.12] | 2.16 / 6.35 | 152.0 | bulk_density | 0.49 | uyarı [sentetik] |
+| SYN_0029 | site_05 | 2.955 | [2.03, 3.88] | 1.83 / 4.79 | 110.7 | carbon_pct | 0.47 | uyarı [sentetik] |
+| SYN_0030 | site_06 | 2.360 | [1.44, 3.28] | 1.69 / 4.05 | 93.1 | carbon_pct | 0.43 | uyarı [sentetik] |
+| SYN_0031 | site_07 | 1.071 | [0.15, 1.99] | 2.44 / 3.51 | 45.1 | carbon_pct | 0.54 | uyarı [sentetik] |
+| SYN_0032 | site_08 | 4.048 | [3.13, 4.97] | 2.28 / 6.33 | 148.1 | bulk_density | 0.48 | uyarı [sentetik] |
+| SYN_0033 | site_01 | 2.446 | [1.52, 3.37] | 2.07 / 4.52 | 89.0 | carbon_pct | 0.54 | uyarı [sentetik] |
+| SYN_0034 | site_02 | 3.933 | [3.01, 4.86] | 1.09 / 5.02 | 129.9 | bulk_density | 0.68 | uyarı [sentetik] |
+| SYN_0035 | site_03 | 2.859 | [1.94, 3.78] | 3.04 / 5.90 | 114.4 | carbon_pct | 0.60 | uyarı [sentetik] |
+| SYN_0036 | site_04 | 3.573 | [2.65, 4.50] | 2.19 / 5.77 | 131.5 | carbon_pct | 0.52 | uyarı [sentetik] |
+| SYN_0037 | site_05 | 1.552 | [0.63, 2.47] | 2.50 / 4.05 | 65.4 | carbon_pct | 0.45 | uyarı [sentetik] |
+| SYN_0038 | site_06 | 2.291 | [1.37, 3.21] | 3.78 / 6.07 | 96.5 | carbon_pct | 0.75 | uyarı [sentetik] |
+| SYN_0039 | site_07 | 3.807 | [2.88, 4.73] | 3.78 / 7.59 | 139.0 | bulk_density | 0.59 | uyarı [sentetik] |
+| SYN_0040 | site_08 | 3.978 | [3.05, 4.90] | 2.48 / 6.46 | 162.9 | bulk_density | 0.49 | uyarı [sentetik] |
+| SYN_0041 | site_01 | 2.700 | [1.78, 3.62] | 3.50 / 6.20 | 109.8 | carbon_pct | 0.62 | uyarı [sentetik] |
+| SYN_0042 | site_02 | 1.648 | [0.73, 2.57] | 1.44 / 3.09 | 62.2 | carbon_pct | 0.61 | uyarı [sentetik] |
+| SYN_0043 | site_03 | 3.152 | [2.23, 4.08] | 2.65 / 5.80 | 100.9 | carbon_pct | 0.64 | uyarı [sentetik] |
+| SYN_0044 | site_04 | 0.158 | [0.00, 1.08] | 2.43 / 2.59 | 6.4 | carbon_pct | 0.60 | uyarı [sentetik] |
+| SYN_0045 | site_05 | 1.875 | [0.95, 2.80] | 3.24 / 5.12 | 67.9 | carbon_pct | 0.45 | uyarı [sentetik] |
+| SYN_0046 | site_06 | 4.778 | [3.85, 5.70] | 2.43 / 7.21 | 148.3 | bulk_density | 0.46 | uyarı [sentetik] |
+| SYN_0047 | site_07 | 4.144 | [3.22, 5.07] | 1.72 / 5.86 | 153.2 | bulk_density | 0.48 | uyarı [sentetik] |
+| SYN_0048 | site_08 | 4.492 | [3.57, 5.42] | 2.47 / 6.96 | 146.3 | bulk_density | 0.50 | uyarı [sentetik] |
+| SYN_0049 | site_01 | 1.133 | [0.21, 2.06] | 2.19 / 3.32 | 44.3 | carbon_pct | 0.58 | uyarı [sentetik] |
+| SYN_0050 | site_02 | 3.641 | [2.72, 4.56] | 2.65 / 6.29 | 117.4 | bulk_density | 0.36 | uyarı [sentetik] |
+| SYN_0051 | site_03 | 2.929 | [2.01, 3.85] | 2.16 / 5.08 | 112.4 | carbon_pct | 0.49 | uyarı [sentetik] |
+| SYN_0052 | site_04 | 1.310 | [0.39, 2.23] | 2.65 / 3.96 | 46.9 | carbon_pct | 0.45 | uyarı [sentetik] |
+| SYN_0053 | site_05 | 3.907 | [2.98, 4.83] | 3.18 / 7.08 | 130.2 | bulk_density | 0.49 | uyarı [sentetik] |
+| SYN_0054 | site_06 | 4.334 | [3.41, 5.26] | 1.45 / 5.78 | 143.4 | bulk_density | 0.45 | uyarı [sentetik] |
+| SYN_0055 | site_07 | 1.970 | [1.05, 2.89] | 1.97 / 3.94 | 73.7 | carbon_pct | 0.63 | uyarı [sentetik] |
+| SYN_0056 | site_08 | 4.276 | [3.35, 5.20] | 1.99 / 6.26 | 130.4 | bulk_density | 0.49 | uyarı [sentetik] |
+| SYN_0057 | site_01 | 1.626 | [0.70, 2.55] | 1.46 / 3.08 | 71.0 | carbon_pct | 0.57 | uyarı [sentetik] |
+| SYN_0058 | site_02 | 1.259 | [0.34, 2.18] | 4.07 / 5.33 | 49.1 | carbon_pct | 0.59 | uyarı [sentetik] |
+| SYN_0059 | site_03 | 1.940 | [1.02, 2.86] | 2.81 / 4.75 | 68.0 | carbon_pct | 0.68 | uyarı [sentetik] |
+| SYN_0060 | site_04 | 1.734 | [0.81, 2.66] | 1.55 / 3.28 | 79.1 | carbon_pct | 0.60 | uyarı [sentetik] |
+| SYN_0061 | site_05 | 2.959 | [2.04, 3.88] | 3.68 / 6.64 | 117.6 | carbon_pct | 0.56 | uyarı [sentetik] |
+| SYN_0062 | site_06 | 5.006 | [4.08, 5.93] | 0.72 / 5.72 | 172.5 | bulk_density | 0.98 | uyarı [sentetik] |
+| SYN_0063 | site_07 | 1.433 | [0.51, 2.36] | 2.41 / 3.84 | 63.2 | carbon_pct | 0.60 | uyarı [sentetik] |
+| SYN_0064 | site_08 | 3.123 | [2.20, 4.05] | 1.55 / 4.67 | 103.8 | carbon_pct | 0.77 | uyarı [sentetik] |
+| SYN_0065 | site_01 | 1.224 | [0.30, 2.15] | 1.52 / 2.74 | 50.0 | carbon_pct | 0.49 | uyarı [sentetik] |
+| SYN_0066 | site_02 | 2.460 | [1.54, 3.38] | 3.02 / 5.48 | 89.6 | carbon_pct | 0.66 | uyarı [sentetik] |
+| SYN_0067 | site_03 | 2.451 | [1.53, 3.37] | 1.60 / 4.05 | 82.7 | carbon_pct | 0.67 | uyarı [sentetik] |
+| SYN_0068 | site_04 | 1.935 | [1.01, 2.86] | 1.40 / 3.33 | 67.4 | carbon_pct | 0.70 | uyarı [sentetik] |
+| SYN_0069 | site_05 | 2.274 | [1.35, 3.20] | 2.75 / 5.03 | 85.2 | carbon_pct | 0.59 | uyarı [sentetik] |
+| SYN_0070 | site_06 | 3.922 | [3.00, 4.84] | 3.32 / 7.24 | 129.2 | bulk_density | 0.42 | uyarı [sentetik] |
+| SYN_0071 | site_07 | 3.355 | [2.43, 4.28] | 2.66 / 6.02 | 117.3 | carbon_pct | 0.58 | uyarı [sentetik] |
+| SYN_0072 | site_08 | 2.774 | [1.85, 3.70] | 1.75 / 4.52 | 91.3 | carbon_pct | 0.46 | uyarı [sentetik] |
+| SYN_0073 | site_01 | 4.388 | [3.46, 5.31] | 1.77 / 6.16 | 155.5 | bulk_density | 0.50 | uyarı [sentetik] |
+| SYN_0074 | site_02 | 1.331 | [0.41, 2.25] | 2.69 / 4.02 | 56.8 | carbon_pct | 0.70 | uyarı [sentetik] |
+| SYN_0075 | site_03 | 1.732 | [0.81, 2.65] | 3.12 / 4.85 | 59.3 | carbon_pct | 0.41 | uyarı [sentetik] |
+| SYN_0076 | site_04 | 0.282 | [0.00, 1.21] | 3.68 / 3.96 | 11.3 | carbon_pct | 0.62 | uyarı [sentetik] |
+| SYN_0077 | site_05 | 3.591 | [2.67, 4.51] | 2.38 / 5.97 | 139.8 | carbon_pct | 0.59 | uyarı [sentetik] |
+| SYN_0078 | site_06 | 3.085 | [2.16, 4.01] | 2.89 / 5.98 | 100.0 | carbon_pct | 0.64 | uyarı [sentetik] |
+| SYN_0079 | site_07 | 4.012 | [3.09, 4.94] | 2.35 / 6.36 | 124.2 | bulk_density | 0.54 | uyarı [sentetik] |
+| SYN_0080 | site_08 | 4.545 | [3.62, 5.47] | 2.07 / 6.61 | 138.2 | bulk_density | 0.44 | uyarı [sentetik] |

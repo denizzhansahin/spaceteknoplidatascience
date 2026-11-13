@@ -173,6 +173,9 @@ def _extract_optional_target(records: Sequence[Measurement], field_name: str) ->
 def _fit_fold_chemometrics(
     config: TrainerConfig,
     train_recs: Sequence[Measurement],
+    *,
+    external_wet: SoilDataset | None = None,
+    external_dry: SoilDataset | None = None,
 ) -> ChemometricPipeline:
     wl = train_recs[0].spectrum.wavelength_grid_nm
     chemo = ChemometricPipeline(config.preprocess_config)
@@ -180,7 +183,7 @@ def _fit_fold_chemometrics(
         chemo.fit(wl)
         return chemo
 
-    # Pair wet and dry spectra matching by sample_id strictly inside train_recs
+    # Prefer paired wet/dry spectra strictly inside train_recs; fall back to external calibration pairs if supplied
     dry_by_id = {r.sample_id: r.spectrum.values for r in train_recs if r.moisture_scenario == "dry"}
     wet_list: list[np.ndarray] = []
     dry_list: list[np.ndarray] = []
@@ -189,10 +192,17 @@ def _fit_fold_chemometrics(
             wet_list.append(r.spectrum.values)
             dry_list.append(dry_by_id[r.sample_id])
 
+    if not wet_list and external_wet is not None and external_dry is not None:
+        ext_dry_by_id = {r.sample_id: r.spectrum.values for r in external_dry.records}
+        for r in external_wet.records:
+            if r.sample_id in ext_dry_by_id:
+                wet_list.append(r.spectrum.values)
+                dry_list.append(ext_dry_by_id[r.sample_id])
+
     if not wet_list:
         raise SchemaError(
             f"ChemometricPipeline suppression_mode='{config.preprocess_config.suppression_mode}' "
-            "requires paired wet/dry training samples inside each fold."
+            "requires paired wet/dry training samples inside each fold or external calibration pairs."
         )
     chemo.fit(wl, X_wet=np.vstack(wet_list), X_dry=np.vstack(dry_list))
     return chemo
@@ -237,6 +247,8 @@ class STSoilTrainer:
         group_by: GroupKeyType = "site_id",
         model_factories: dict[str, Callable[[int], BaseSoilRegressor]] | None = None,
         include_optional_models: bool = True,
+        wet_dataset: SoilDataset | None = None,
+        dry_dataset: SoilDataset | None = None,
     ) -> BenchmarkReport:
         """Train and compare all candidate models across identical leakage-free folds (ADR-005)."""
         records = dataset.records
@@ -280,7 +292,12 @@ class STSoilTrainer:
             eval_counts[va_idx] += 1
 
             # Fit preprocessing + feature fusion strictly inside training fold
-            chemo = _fit_fold_chemometrics(self.config, tr_recs)
+            chemo = _fit_fold_chemometrics(
+                self.config,
+                tr_recs,
+                external_wet=wet_dataset,
+                external_dry=dry_dataset,
+            )
             fusion = FeatureFusionPipeline(self.config.fusion_config)
             fusion.fit(tr_recs, chemometric_pipeline=chemo)
 

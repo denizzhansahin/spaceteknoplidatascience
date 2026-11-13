@@ -274,6 +274,7 @@ class STSoilAnalyzer:
         hybrid_class_probs: list[float] | None = None
 
         if isinstance(model, STSoilHybridNetRegressor):
+            has_soc_pred = True
             struct = model.predict_structured(fused.X_spectral, fused.X_covariates)
             soc_pct = float(struct.soc_mean_pct[0])
             soc_std = float(struct.soc_std_pct[0]) if struct.soc_std_pct is not None else 0.1
@@ -296,18 +297,39 @@ class STSoilAnalyzer:
                 primary_mean, primary_std = soc_pct, soc_std
         else:
             mean_arr, std_arr = model.predict_distribution(fused.X_fused)
-            mean_flat = np.asarray(mean_arr, dtype=np.float64).reshape(-1)
-            std_flat = np.asarray(std_arr, dtype=np.float64).reshape(-1)
-            primary_mean = float(mean_flat[0])
-            primary_std = float(std_flat[0])
-            if primary_target == "sic_pct":
-                sic_pct, sic_std = primary_mean, primary_std
-                soc_pct, soc_std = 0.0, primary_std
-            elif primary_target == "tc_pct":
-                tc_pct, tc_std = primary_mean, primary_std
-                soc_pct, soc_std = primary_mean, primary_std
+            mean_2d = np.atleast_2d(np.asarray(mean_arr, dtype=np.float64))
+            std_2d = np.atleast_2d(np.asarray(std_arr, dtype=np.float64))
+            preds_by_name = {
+                tname: float(mean_2d[0, col_idx])
+                for col_idx, tname in enumerate(model.target_names)
+                if col_idx < mean_2d.shape[1]
+            }
+            stds_by_name = {
+                tname: float(std_2d[0, col_idx])
+                for col_idx, tname in enumerate(model.target_names)
+                if col_idx < std_2d.shape[1]
+            }
+            primary_mean = preds_by_name.get(primary_target, float(mean_2d[0, 0]))
+            primary_std = stds_by_name.get(primary_target, float(std_2d[0, 0]))
+
+            if len(preds_by_name) > 1 or mean_2d.shape[1] > 1:
+                has_soc_pred = ("soc_pct" in preds_by_name) or (primary_target != "sic_pct")
+                soc_pct = preds_by_name.get("soc_pct", primary_mean)
+                soc_std = stds_by_name.get("soc_pct", primary_std)
+                sic_pct = preds_by_name.get("sic_pct")
+                sic_std = stds_by_name.get("sic_pct")
+                tc_pct = preds_by_name.get("tc_pct")
+                tc_std = stds_by_name.get("tc_pct")
             else:
-                soc_pct, soc_std = primary_mean, primary_std
+                has_soc_pred = primary_target != "sic_pct"
+                if primary_target == "sic_pct":
+                    sic_pct, sic_std = primary_mean, primary_std
+                    soc_pct, soc_std = 0.0, primary_std
+                elif primary_target == "tc_pct":
+                    tc_pct, tc_std = primary_mean, primary_std
+                    soc_pct, soc_std = primary_mean, primary_std
+                else:
+                    soc_pct, soc_std = primary_mean, primary_std
         timings["inference_ms"] = (time.perf_counter() - t2) * 1000.0
 
         # Stage 4: Uncertainty Interval Calibration & Out-of-Domain Assessment
@@ -351,7 +373,7 @@ class STSoilAnalyzer:
         # Stage 5: Carbon Accounting & Stock (Strict DEF-005 / ADR-004 Compliance)
         t4 = time.perf_counter()
         fraction_res = partition_carbon(
-            soc=soc_pct if primary_target != "sic_pct" else None,
+            soc=soc_pct if has_soc_pred else None,
             sic=sic_pct,
             tc=tc_pct,
             unit="pct",
@@ -391,8 +413,8 @@ class STSoilAnalyzer:
 
         carbon_metrics_block: dict[str, Any] = {
             "primary_target": primary_target,
-            "soc_pct": soc_pct if primary_target != "sic_pct" else None,
-            "soc_std_pct": soc_std if primary_target != "sic_pct" else None,
+            "soc_pct": soc_pct if has_soc_pred else None,
+            "soc_std_pct": soc_std if has_soc_pred else None,
             "sic_pct": sic_pct,
             "sic_std_pct": sic_std,
             "tc_pct": tc_pct,

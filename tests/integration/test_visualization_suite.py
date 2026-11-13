@@ -169,3 +169,40 @@ def test_cli_visualize_subcommand_runs_cleanly(tmp_path: Path, capsys) -> None:
     assert payload["n_3d_plots"] == 4
     assert payload["n_tables"] == 5
     assert Path(payload["dashboard_path"]).is_file()
+
+
+def test_default_synthetic_has_2d_coordinates_for_kriging(tmp_path: Path) -> None:
+    from st_ds.visualization.base import extract_dataset_arrays
+    from st_ds.visualization.science_plots import compute_spatial_kriging_bundle
+
+    gen = SyntheticGeneratorV2(SyntheticConfig(dataset_id="krig_2d_v1", n_samples=40, n_sites=6, seed=42))
+    ds = gen.generate_dataset()
+    wet_ds, dry_ds = gen.generate_paired_wet_dry_dataset(n_pairs=12)
+
+    coords = {(round(r.coordinates.lon, 6), round(r.coordinates.lat, 6)) for r in ds.records if r.coordinates}
+    assert len(coords) >= 8
+    lons = {c[0] for c in coords}
+    lats = {c[1] for c in coords}
+    assert len(lons) >= 3
+    assert len(lats) >= 3
+
+    arrays = extract_dataset_arrays(ds)
+    bundle = compute_spatial_kriging_bundle(arrays, arrays.soc, grid_size=16)
+    assert bundle is not None
+    assert bundle.grid_x_m.shape == (16, 16)
+    assert bundle.kriging is not None
+
+    out_dir = tmp_path / "viz_2d_krig"
+    report = generate_full_visualization_suite(
+        ds,
+        out_dir,
+        wet_dataset=wet_ds,
+        dry_dataset=dry_ds,
+        config=VisualizationConfig(lang="en", dpi=90, include_interactive_3d=False),
+    )
+    audit_csv = (out_dir / "tables" / "05_tahmin_ve_stok_denetim_raporu.csv").read_text(encoding="utf-8")
+    assert "warning [synthetic]" in audit_csv
+    assert "N/A (soc-only)" not in audit_csv
+    assert "- / -" not in audit_csv
+    assert report.n_plots == 26
+

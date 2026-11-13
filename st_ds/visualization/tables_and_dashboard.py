@@ -99,11 +99,25 @@ def plot_26_covariate_3d_response_surface(
     fig = plt.figure(figsize=(11.2, 7.2))
     ax = fig.add_subplot(111, projection="3d")
     surf = ax.plot_surface(GX, GY, GZ, cmap="coolwarm", alpha=0.52, edgecolor="none")
-    sc = ax.scatter(xv, yv, zv, c=zv, cmap="viridis", s=52, edgecolor="#1A202C", depthshade=False, label="Ölçümler")
+    sc = ax.scatter(
+        xv,
+        yv,
+        zv,
+        c=zv,
+        cmap="viridis",
+        s=52,
+        edgecolor="#1A202C",
+        depthshade=False,
+        label=pick_text(lang, tr="Ölçümler", en="Samples"),
+    )
     fig.colorbar(sc, ax=ax, shrink=0.62, pad=0.08).set_label(f"{ctx.target_name} (%)")
 
     ax.set_title(
-        f"26. 3D Kovaryat Tepki Yüzeyi ({x_label} × {y_label} × {ctx.target_name})",
+        pick_text(
+            lang,
+            tr=f"26. 3D Kovaryat Tepki Yüzeyi ({x_label} × {y_label} × {ctx.target_name})",
+            en=f"26. 3D Covariate Response Surface ({x_label} × {y_label} × {ctx.target_name})",
+        ),
         fontsize=12.4,
         fontweight="bold",
         color=PALETTE["navy"],
@@ -327,24 +341,56 @@ def build_and_export_tables(
             if "lower_pct" in ci and "upper_pct" in ci
             else "-"
         )
-        sic_str = f"{float(cm['sic_pct']):.2f}" if cm.get("sic_pct") is not None else "-"
-        tc_str = f"{float(cm['tc_pct']):.2f}" if cm.get("tc_pct") is not None else "-"
+        if cm.get("sic_pct") is not None or cm.get("tc_pct") is not None:
+            sic_str = f"{float(cm['sic_pct']):.2f}" if cm.get("sic_pct") is not None else "-"
+            tc_str = f"{float(cm['tc_pct']):.2f}" if cm.get("tc_pct") is not None else "-"
+            sic_tc_str = f"{sic_str} / {tc_str}"
+        elif np.isfinite(arrays.sic[idx]) or np.isfinite(arrays.tc[idx]):
+            ref_sic = f"{float(arrays.sic[idx]):.2f}" if np.isfinite(arrays.sic[idx]) else "-"
+            ref_tc = f"{float(arrays.tc[idx]):.2f}" if np.isfinite(arrays.tc[idx]) else "-"
+            sic_tc_str = f"Ref {ref_sic}/{ref_tc}"
+        else:
+            sic_tc_str = pick_text(lang, tr="Yok (tek hedef)", en="N/A (soc-only)")
         st_val = cs.get("stock_mg_ha")
         st_str = f"{float(st_val):.1f}" if st_val is not None else t("missing_bd", lang)
         dom_src = str(unc.get("dominant_uncertainty_source") or "-")
         ood_sc = rep.diagnostics.get("ood_score")
         ood_str = f"{float(ood_sc):.2f}" if ood_sc is not None else "-"
+        w_codes = list(rep.diagnostics.get("warning_codes") or ())
+        if rep.status.value == "ok":
+            status_str = "ok"
+        else:
+            short_tags: list[str] = []
+            for wc in w_codes:
+                wcs = str(wc)
+                if "synthetic" in wcs:
+                    short_tags.append(pick_text(lang, tr="sentetik", en="synthetic"))
+                elif "bulk_density" in wcs:
+                    short_tags.append(pick_text(lang, tr="eksik_bd", en="missing_bd"))
+                elif "ood" in wcs:
+                    short_tags.append("ood")
+                elif "closure" in wcs:
+                    short_tags.append("closure")
+                else:
+                    short_tags.append(wcs[:12])
+            base_st = pick_text(
+                lang,
+                tr="uyarı" if rep.status.value == "warning" else rep.status.value,
+                en=rep.status.value,
+            )
+            tag_label = ",".join(dict.fromkeys(short_tags[:2]))
+            status_str = f"{base_st} [{tag_label}]" if tag_label else base_st
         t5_rows.append(
             [
                 str(rep.identity.get("sample_id", arrays.sample_ids[idx])),
                 str(rep.identity.get("site_id") or "-"),
                 pred_str,
                 ci_str,
-                f"{sic_str} / {tc_str}",
+                sic_tc_str,
                 st_str,
                 dom_src,
                 ood_str,
-                rep.status.value,
+                status_str,
             ]
         )
 

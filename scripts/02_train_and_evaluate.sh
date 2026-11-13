@@ -83,6 +83,7 @@ PYTHONPATH="$REPO_ROOT" "$RESOLVED_PYTHON" -m st_ds.cli dataset validate \
   --output "$RUN_DIR/01_validation.json" >/dev/null
 
 # 3. İsteğe bağlı EPO Nem Baskılama Matrisi Uydurma
+EPO_FLAGS=()
 if [[ -n "${WET_PATH:-}" && -f "$WET_PATH" && -n "${DRY_PATH:-}" && -f "$DRY_PATH" ]]; then
   echo "[3/6] EPO nem baskılama projeksiyonu hesaplanıyor (calibration fit-epo)..."
   PYTHONPATH="$REPO_ROOT" "$RESOLVED_PYTHON" -m st_ds.cli calibration fit-epo \
@@ -90,8 +91,14 @@ if [[ -n "${WET_PATH:-}" && -f "$WET_PATH" && -n "${DRY_PATH:-}" && -f "$DRY_PAT
     --dry "$DRY_PATH" \
     --output "$RUN_DIR/02_epo_projection.json" \
     --q 2 >/dev/null
+  EPO_FLAGS=(--suppression-mode epo --epo-q 2 --wet "$WET_PATH" --dry "$DRY_PATH")
 else
   echo "[3/6] Islak/Kuru çifti verilmedi; fit-epo adımı atlandı."
+fi
+
+MULTI_TARGET_FLAG=()
+if [[ "${MULTI_TARGET:-1}" != "0" ]]; then
+  MULTI_TARGET_FLAG=(--multi-target)
 fi
 
 # 4. Gruplanmış K-Katlı Çapraz Doğrulama (Leakage-Free Model Benchmark)
@@ -100,6 +107,7 @@ PYTHONPATH="$REPO_ROOT" "$RESOLVED_PYTHON" -m st_ds.cli evaluate \
   --input "$INPUT_PATH" \
   --target "$TARGET" \
   --folds "$FOLDS" \
+  ${EPO_FLAGS[@]+"${EPO_FLAGS[@]}"} \
   --seed "$SEED" \
   --include-optional \
   --output "$RUN_DIR/03_cv_benchmark.json" >/dev/null
@@ -112,6 +120,8 @@ PYTHONPATH="$REPO_ROOT" "$RESOLVED_PYTHON" -m st_ds.cli train \
   --model "$MODEL" \
   --target "$TARGET" \
   --folds "$FOLDS" \
+  ${EPO_FLAGS[@]+"${EPO_FLAGS[@]}"} \
+  ${MULTI_TARGET_FLAG[@]+"${MULTI_TARGET_FLAG[@]}"} \
   --hybrid-epochs "$EPOCHS" \
   --seed "$SEED" \
   --lang "$ACTIVE_LANG" \

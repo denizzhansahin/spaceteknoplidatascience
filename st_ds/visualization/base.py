@@ -404,14 +404,27 @@ def render_table_figure(
     fig.suptitle(title, fontsize=12.5, fontweight="bold", color=PALETTE["navy"], y=0.97)
 
     safe_rows = [list(r) for r in rows] if rows else [[t("no_data", config.lang)] + [""] * (n_cols - 1)]
+    col_chars = [
+        max(
+            [len(str(headers[c]))] + [len(str(r[c])) if c < len(r) else 0 for r in safe_rows] + [4]
+        )
+        for c in range(n_cols)
+    ]
+    raw_weights = [max(5.5, float(ch) + 2.2) for ch in col_chars]
+    total_weight = float(sum(raw_weights)) or 1.0
+    col_widths = [w / total_weight for w in raw_weights]
+
     tbl = ax.table(
         cellText=safe_rows,
         colLabels=list(headers),
+        colWidths=col_widths,
         loc="center",
         cellLoc="center",
     )
     tbl.auto_set_font_size(False)
-    tbl.set_fontsize(8.4 if n_cols <= 9 else 7.4)
+    total_chars = sum(col_chars)
+    font_sz = 6.8 if total_chars > 125 else (7.4 if (total_chars > 95 or n_cols > 9) else 8.2)
+    tbl.set_fontsize(font_sz)
     tbl.scale(1.0, 1.45)
 
     for (r_idx, c_idx), cell in tbl.get_celld().items():

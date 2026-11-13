@@ -1,13 +1,13 @@
 {
   "stds_version": "0.1.0",
   "schema_version": "1.0.0",
-  "generated_at_utc": "2026-11-13T01:39:29.007429+00:00",
-  "output_dir": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite",
-  "manifest_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/viz_manifest.json",
-  "dashboard_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/index.html",
-  "pdf_report_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/reports/stds_analysis_report.pdf",
+  "generated_at_utc": "2026-11-13T02:27:28.226349+00:00",
+  "output_dir": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite",
+  "manifest_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/viz_manifest.json",
+  "dashboard_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/index.html",
+  "pdf_report_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/reports/stds_analysis_report.pdf",
   "lang": "tr",
-  "dataset_id": "stds_synth_20261113_023859",
+  "dataset_id": "stds_synth_20261113_032701",
   "dataset_source": "synthetic",
   "target_name": "soc_pct",
   "n_plots": 26,
@@ -20,7 +20,7 @@
       "category": "Spektrum, Kemometri & Sensör Kalitesi",
       "is_3d": false,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/01_ham_spektrumlar_ve_kimyasal_bantlar.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/01_ham_spektrumlar_ve_kimyasal_bantlar.png"
       ],
       "description": "Grup bazlı ortalama ± standart sapma zarfları, su/kil/karbonat bantları ve SOC dağılımı."
     },
@@ -30,7 +30,7 @@
       "category": "Spektrum, Kemometri & Sensör Kalitesi",
       "is_3d": false,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/02_kemometri_donusum_asamalari.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/02_kemometri_donusum_asamalari.png"
       ],
       "description": "Saçılma ve taban çizgisi sürüklenmesinin Absorbans, SNV ve SavGol türevi ile adım adım giderilmesi."
     },
@@ -40,7 +40,7 @@
       "category": "Spektrum, Kemometri & Sensör Kalitesi",
       "is_3d": false,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/03_epo_nem_baskilama_karsilastirma.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/03_epo_nem_baskilama_karsilastirma.png"
       ],
       "description": "EPO projeksiyonu öncesi ve sonrası ıslak-kuru fark spektrumu ve nem bileşeni varyans oranı."
     },
@@ -50,7 +50,7 @@
       "category": "Spektrum, Kemometri & Sensör Kalitesi",
       "is_3d": true,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/04_spektral_3d_yuzey.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/04_spektral_3d_yuzey.png"
       ],
       "description": "Dalga boyu ve SOC sıralı örnekler boyunca üç boyutlu spektral yüzey. Örnekler artan SOC (%) sırasına göre dizilmiştir."
     },
@@ -60,7 +60,7 @@
       "category": "Spektrum, Kemometri & Sensör Kalitesi",
       "is_3d": false,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/05_dalga_boyu_korelasyon_matrisi.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/05_dalga_boyu_korelasyon_matrisi.png"
       ],
       "description": "Spektral bant eşdoğrusallık ısı haritası ve SOC korelasyon profili."
     },
@@ -70,7 +70,7 @@
       "category": "Spektrum, Kemometri & Sensör Kalitesi",
       "is_3d": false,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/06_sinyal_qc_teshis.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/06_sinyal_qc_teshis.png"
       ],
       "description": "Her ölçüm için sinyal kalite skoru, SNR tahmini ve kalite kapısı dağılımı."
     },
@@ -80,7 +80,7 @@
       "category": "Spektrum, Kemometri & Sensör Kalitesi",
       "is_3d": false,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/07_eis_veya_kovaryat_matrisi.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/07_eis_veya_kovaryat_matrisi.png"
       ],
       "description": "EIS Nyquist spektrumu (varsa) veya nem-pH-SOC saçılımı ile kovaryat korelasyon matrisi."
     },
@@ -90,7 +90,7 @@
       "category": "Model Kıyaslama, Belirsizlik & OOD",
       "is_3d": false,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/08_model_kiyaslama_metrikleri.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/08_model_kiyaslama_metrikleri.png"
       ],
       "description": "PLSR, Kernel Ridge, Local PLSR, Random Forest ve STSoilHybridNet OOF performans kıyaslaması."
     },
@@ -100,7 +100,7 @@
       "category": "Model Kıyaslama, Belirsizlik & OOD",
       "is_3d": false,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/09_gercek_vs_tahmin_ve_ci90.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/09_gercek_vs_tahmin_ve_ci90.png"
       ],
       "description": "1:1 parite çizgisi, doğrusal uyum eğrisi ve kalibre edilmiş %90 tahmin aralıkları."
     },
@@ -110,7 +110,7 @@
       "category": "Model Kıyaslama, Belirsizlik & OOD",
       "is_3d": false,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/10_bland_altman_uyum.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/10_bland_altman_uyum.png"
       ],
       "description": "Tahmin ile referans laboratuvar yöntemi arasındaki ortalama sapma ve %95 uyum sınırları."
     },
@@ -120,7 +120,7 @@
       "category": "Model Kıyaslama, Belirsizlik & OOD",
       "is_3d": false,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/11_artik_teshis_4panel.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/11_artik_teshis_4panel.png"
       ],
       "description": "Tahmine göre artık saçılımı, histogram, Q-Q normallik testi ve nem senaryosu kutu grafiği."
     },
@@ -130,7 +130,7 @@
       "category": "Model Kıyaslama, Belirsizlik & OOD",
       "is_3d": false,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/12_alt_grup_hata_isi_haritasi.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/12_alt_grup_hata_isi_haritasi.png"
       ],
       "description": "Saha ve nem/toprak alt gruplarında modelin RMSE ve sistematik sapma dağılımı."
     },
@@ -140,7 +140,7 @@
       "category": "Model Kıyaslama, Belirsizlik & OOD",
       "is_3d": false,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/13_conformal_kalibrasyon_kapsami.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/13_conformal_kalibrasyon_kapsami.png"
       ],
       "description": "Farklı güven düzeylerinde nominal vs ampirik kapsam oranları ve aralık genişlikleri."
     },
@@ -150,7 +150,7 @@
       "category": "Model Kıyaslama, Belirsizlik & OOD",
       "is_3d": false,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/14_belirsizlik_aleatoric_epistemic.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/14_belirsizlik_aleatoric_epistemic.png"
       ],
       "description": "Model standart sapması, Conformal kapsam payı ve belirsizlik-hata uyumluluğu."
     },
@@ -160,7 +160,7 @@
       "category": "Model Kıyaslama, Belirsizlik & OOD",
       "is_3d": false,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/15_ood_etki_alani_haritasi.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/15_ood_etki_alani_haritasi.png"
       ],
       "description": "Mahalanobis ve kNN oranlarına göre eğitim uzayı dışındaki ölçümlerin tespiti."
     },
@@ -170,7 +170,7 @@
       "category": "Model Kıyaslama, Belirsizlik & OOD",
       "is_3d": true,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/16_pca_3d_gizli_uzay.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/16_pca_3d_gizli_uzay.png"
       ],
       "description": "Birleşik spektral-kovaryat öznitelik uzayının ilk 3 temel bileşeninde SOC gradyanı."
     },
@@ -180,7 +180,7 @@
       "category": "XAI Açıklanabilirlik, Karbon Stoku & Mekânsal Kriging",
       "is_3d": false,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/17_xai_duyarlilik_ve_ig_spektral.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/17_xai_duyarlilik_ve_ig_spektral.png"
       ],
       "description": "Modelin tahmin üretirken hangi dalga boylarına duyarlı olduğunu gösteren IG ve gradyan profili."
     },
@@ -190,7 +190,7 @@
       "category": "XAI Açıklanabilirlik, Karbon Stoku & Mekânsal Kriging",
       "is_3d": false,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/18_xai_hsic_ve_kovaryat_onemi.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/18_xai_hsic_ve_kovaryat_onemi.png"
       ],
       "description": "RBF HSIC bağımlılık sıralaması (nedensellik değildir) ve spektral/kovaryat bileşen önemleri."
     },
@@ -200,7 +200,7 @@
       "category": "XAI Açıklanabilirlik, Karbon Stoku & Mekânsal Kriging",
       "is_3d": false,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/19_xai_ikili_etkilesim_isi_haritasi.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/19_xai_ikili_etkilesim_isi_haritasi.png"
       ],
       "description": "Spektral bantlar ve toprak kovaryatları arasındaki doğrusal olmayan ikinci derece etkileşimler."
     },
@@ -210,7 +210,7 @@
       "category": "XAI Açıklanabilirlik, Karbon Stoku & Mekânsal Kriging",
       "is_3d": false,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/20_karbon_fraksiyonlari_ve_kapatma.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/20_karbon_fraksiyonlari_ve_kapatma.png"
       ],
       "description": "SOC, SIC ve TC yığılmış fraksiyonları ile TC = SOC + SIC kütle dengesi sapması."
     },
@@ -220,7 +220,7 @@
       "category": "XAI Açıklanabilirlik, Karbon Stoku & Mekânsal Kriging",
       "is_3d": false,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/21_karbon_stoku_ve_varyans_tornado.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/21_karbon_stoku_ve_varyans_tornado.png"
       ],
       "description": "Katman karbon stoku (Mg C ha⁻¹) dağılımı ve hacim ağırlığı/karbon belirsizlik payları."
     },
@@ -230,9 +230,9 @@
       "category": "XAI Açıklanabilirlik, Karbon Stoku & Mekânsal Kriging",
       "is_3d": false,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/22_mekansal_variogram_modeli.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/22_mekansal_variogram_modeli.png"
       ],
-      "description": "Variogram uyumu için en az 8 farklı koordinat noktası (lon, lat) gereklidir."
+      "description": "Matheron ampirik variogram noktaları, nugget/sill/range parametreleri ve model uyumu."
     },
     {
       "plot_id": "23_ordinary_kriging_2d_3d",
@@ -240,9 +240,9 @@
       "category": "XAI Açıklanabilirlik, Karbon Stoku & Mekânsal Kriging",
       "is_3d": true,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/23_ordinary_kriging_2d_ve_3d.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/23_ordinary_kriging_2d_ve_3d.png"
       ],
-      "description": "2D/3D Ordinary Kriging enterpolasyonu için en az 8 ayrı saha koordinatı gereklidir."
+      "description": "Yerel metrik koordinat düzleminde 2D Kriging belirsizlik konturları ve 3D karbon dağılım yüzeyi."
     },
     {
       "plot_id": "24_dataset_summary_table",
@@ -250,7 +250,7 @@
       "category": "Tablolar, Çok Değişkenli & Pano",
       "is_3d": false,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/24_veri_seti_ozet_tablosu.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/24_veri_seti_ozet_tablosu.png"
       ],
       "description": "Veri setindeki hedef karbon fraksiyonları ve sensör kovaryatlarının özet dağılım tablosu."
     },
@@ -260,7 +260,7 @@
       "category": "Tablolar, Çok Değişkenli & Pano",
       "is_3d": false,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/25_tahmin_denetim_tablosu.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/25_tahmin_denetim_tablosu.png"
       ],
       "description": "Her ölçüm için tahmin, %90 Conformal CI, karbon stoku, baskın belirsizlik kaynağı ve OOD durumu."
     },
@@ -270,7 +270,7 @@
       "category": "Tablolar, Çok Değişkenli & Pano",
       "is_3d": true,
       "files": [
-        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/plots/26_kovaryat_3d_iliski_yuzeyi.png"
+        "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/plots/26_kovaryat_3d_iliski_yuzeyi.png"
       ],
       "description": "En bilgilendirici iki toprak kovaryatı (Volümetrik Nem (%), Toprak pH) üzerinde ikinci derece tepki yüzeyi."
     }
@@ -279,40 +279,40 @@
     {
       "table_id": "01_dataset_summary",
       "title": "Tablo 01: Veri Seti Karbon ve Kovaryat Özet İstatistikleri",
-      "csv_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/tables/01_veri_seti_ozet_istatistikleri.csv",
-      "markdown_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/tables/01_veri_seti_ozet_istatistikleri.md",
+      "csv_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/tables/01_veri_seti_ozet_istatistikleri.csv",
+      "markdown_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/tables/01_veri_seti_ozet_istatistikleri.md",
       "n_rows": 10,
       "n_cols": 7
     },
     {
       "table_id": "02_model_benchmark",
       "title": "Tablo 02: Gruplanmış Çapraz Doğrulama Model Kıyaslama Metrikleri",
-      "csv_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/tables/02_model_karsilastirma_metrikleri.csv",
-      "markdown_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/tables/02_model_karsilastirma_metrikleri.md",
+      "csv_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/tables/02_model_karsilastirma_metrikleri.csv",
+      "markdown_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/tables/02_model_karsilastirma_metrikleri.md",
       "n_rows": 5,
       "n_cols": 9
     },
     {
       "table_id": "03_subgroup_errors",
       "title": "Tablo 03: Saha ve Nem Senaryosuna Göre Alt Grup Hata Dağılımı",
-      "csv_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/tables/03_alt_grup_hata_matrisi.csv",
-      "markdown_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/tables/03_alt_grup_hata_matrisi.md",
-      "n_rows": 23,
+      "csv_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/tables/03_alt_grup_hata_matrisi.csv",
+      "markdown_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/tables/03_alt_grup_hata_matrisi.md",
+      "n_rows": 24,
       "n_cols": 6
     },
     {
       "table_id": "04_xai_ranking",
       "title": "Tablo 04: Birim-Ayrıştırılmış XAI Bileşen Önem Sıralaması",
-      "csv_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/tables/04_xai_bilesen_onem_siralamasi.csv",
-      "markdown_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/tables/04_xai_bilesen_onem_siralamasi.md",
+      "csv_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/tables/04_xai_bilesen_onem_siralamasi.csv",
+      "markdown_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/tables/04_xai_bilesen_onem_siralamasi.md",
       "n_rows": 14,
       "n_cols": 6
     },
     {
       "table_id": "05_prediction_audit",
       "title": "Tablo 05: Örnek Bazlı Tahmin, Güven Aralığı, Stok ve Kalite Denetim Raporu",
-      "csv_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/tables/05_tahmin_ve_stok_denetim_raporu.csv",
-      "markdown_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/tables/05_tahmin_ve_stok_denetim_raporu.md",
+      "csv_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/tables/05_tahmin_ve_stok_denetim_raporu.csv",
+      "markdown_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/tables/05_tahmin_ve_stok_denetim_raporu.md",
       "n_rows": 80,
       "n_cols": 9
     }
@@ -320,13 +320,18 @@
   "interactive_3d_html": [
     {
       "title": "3D Spektral Yüzey (Etkileşimli)",
-      "path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/interactive/3d_spektral_yuzey.html",
+      "path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/interactive/3d_spektral_yuzey.html",
       "filename": "3d_spektral_yuzey.html"
     },
     {
       "title": "3D PCA Öznitelik Uzayı (Etkileşimli)",
-      "path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/05_visualization_suite/interactive/3d_pca_gizli_uzay.html",
+      "path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/interactive/3d_pca_gizli_uzay.html",
       "filename": "3d_pca_gizli_uzay.html"
+    },
+    {
+      "title": "3D Ordinary Kriging Yüzeyi (Etkileşimli)",
+      "path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_032658_full_run/05_visualization_suite/interactive/3d_kriging_yuzey.html",
+      "filename": "3d_kriging_yuzey.html"
     }
   ]
 }
