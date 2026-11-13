@@ -1,0 +1,23 @@
+{
+  "command": "train",
+  "artifact_dir": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/03_artifact_bundle",
+  "selected_model": "kernel_ridge_rbf",
+  "bundle_sha256": "cdd702b9f8993bd5033c9a580d6fe448a2f58dc2937d2c4acd52c593c50b95c0",
+  "is_synthetic_smoke_only": true,
+  "oof_metrics": {
+    "n_samples": 80,
+    "mae": 0.1893104733975246,
+    "rmse": 0.2577455048586386,
+    "bias": -0.011703640157727449,
+    "r2": 0.9624817590542447,
+    "rpiq": 7.880712353022952,
+    "bland_altman_mean_diff": -0.011703640157727449,
+    "bland_altman_std_diff": 0.25910414324158326,
+    "bland_altman_loa_lower": -0.5195477609112306,
+    "bland_altman_loa_upper": 0.4961404805957757,
+    "max_abs_closure_residual": null,
+    "mean_abs_closure_residual": null
+  },
+  "pdf_report_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261113_023857_full_run/03_training_summary.pdf",
+  "lang": "tr"
+}

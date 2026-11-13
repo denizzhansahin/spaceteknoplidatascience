@@ -1,0 +1,60 @@
+# Python byte-code & caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Packaging & build artifacts
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Runtime outputs & temporary analysis directories
+runs/
+artifacts/
+outputs/
+tmp/
+*.pdf
+!STDS_Tam_Sistem_Mimarisi_ve_Fazli_Gelistirme_Plani.pdf
+!runs_examples/
+!runs_examples/**
+!runs_examples/**/*.pdf
+
+# OS & IDE files
+.DS_Store
+.AppleDouble
+.LSOverride
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Keep .env and .env.example tracked in repository as requested
+!.env
+!.env.example

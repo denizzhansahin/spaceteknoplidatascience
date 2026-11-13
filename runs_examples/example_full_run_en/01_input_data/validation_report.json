@@ -1,0 +1,10 @@
+{
+  "command": "dataset validate",
+  "dataset_id": "stds_synth_20261113_024003",
+  "dataset_source": "synthetic",
+  "is_valid": true,
+  "n_records": 80,
+  "n_errors": 0,
+  "errors": [],
+  "warnings": []
+}

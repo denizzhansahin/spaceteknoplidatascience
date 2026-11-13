@@ -1,0 +1,331 @@
+{
+  "schema_version": "1.0.0",
+  "artifact_id": "stds_kernel_ridge_rbf_stds_synth_20261113_023859",
+  "semantic_version": "0.1.0",
+  "model_name": "kernel_ridge_rbf",
+  "model_family": "kernel_method",
+  "target_names": [
+    "soc_pct"
+  ],
+  "target_schema": {
+    "targets": [
+      "soc_pct",
+      "sic_pct",
+      "tc_pct"
+    ],
+    "carbon_unit": "pct",
+    "dry_matter_basis": true,
+    "enforce_non_negative": true,
+    "enforce_tc_closure": true,
+    "closure_tolerance_pct": 0.05,
+    "taxonomy_version": "provisional_taxonomy_v0",
+    "class_labels": [
+      "low_organic_low_carbonate",
+      "low_organic_calcareous",
+      "humus_rich_non_calcareous",
+      "humus_rich_calcareous"
+    ]
+  },
+  "instrument_profile_id": "visnir_24ch_v1",
+  "calibration_id": "cal_synth_v2",
+  "dataset_source": "synthetic",
+  "is_synthetic_smoke_only": true,
+  "validation_metrics": {
+    "n_samples": 80,
+    "mae": 0.1893104733975246,
+    "rmse": 0.2577455048586386,
+    "bias": -0.011703640157727449,
+    "r2": 0.9624817590542447,
+    "rpiq": 7.880712353022952,
+    "bland_altman_mean_diff": -0.011703640157727449,
+    "bland_altman_std_diff": 0.25910414324158326,
+    "bland_altman_loa_lower": -0.5195477609112306,
+    "bland_altman_loa_upper": 0.4961404805957757,
+    "max_abs_closure_residual": null,
+    "mean_abs_closure_residual": null
+  },
+  "subgroup_metrics": {
+    "site_id": {
+      "site_01": {
+        "n_samples": 10,
+        "mae": 0.21594103419582522,
+        "rmse": 0.31230017388739434,
+        "bias": -0.006439479618735255,
+        "r2": 0.9489107666328231,
+        "rpiq": 6.2739566925849815,
+        "bland_altman_mean_diff": -0.006439479618735255,
+        "bland_altman_std_diff": 0.3291232996113169,
+        "bland_altman_loa_lower": -0.6515211468569164,
+        "bland_altman_loa_upper": 0.6386421876194459,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      },
+      "site_02": {
+        "n_samples": 10,
+        "mae": 0.1804778374027201,
+        "rmse": 0.22284766300111777,
+        "bias": -0.010204269472699933,
+        "r2": 0.9684731073898032,
+        "rpiq": 9.349940030493977,
+        "bland_altman_mean_diff": -0.010204269472699933,
+        "bland_altman_std_diff": 0.234655666857699,
+        "bland_altman_loa_lower": -0.47012937651378994,
+        "bland_altman_loa_upper": 0.4497208375683901,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      },
+      "site_03": {
+        "n_samples": 10,
+        "mae": 0.16186162210213398,
+        "rmse": 0.2100215301783774,
+        "bias": 0.05185118097112777,
+        "r2": 0.9568636187644846,
+        "rpiq": 7.111147394350327,
+        "bland_altman_mean_diff": 0.05185118097112777,
+        "bland_altman_std_diff": 0.21452919555354608,
+        "bland_altman_loa_lower": -0.3686260423138225,
+        "bland_altman_loa_upper": 0.4723284042560781,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      },
+      "site_04": {
+        "n_samples": 10,
+        "mae": 0.2785646567540561,
+        "rmse": 0.3260676790054533,
+        "bias": -0.20277522063482084,
+        "r2": 0.9372199826159529,
+        "rpiq": 6.756232164603495,
+        "bland_altman_mean_diff": -0.20277522063482084,
+        "bland_altman_std_diff": 0.2691598888486236,
+        "bland_altman_loa_lower": -0.7303286027781231,
+        "bland_altman_loa_upper": 0.3247781615084813,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      },
+      "site_05": {
+        "n_samples": 10,
+        "mae": 0.20747202449129043,
+        "rmse": 0.3442963518297571,
+        "bias": 0.04654821837617,
+        "r2": 0.9369475030571837,
+        "rpiq": 6.382586256159449,
+        "bland_altman_mean_diff": 0.04654821837617,
+        "bland_altman_std_diff": 0.3595880996196811,
+        "bland_altman_loa_lower": -0.6582444568784049,
+        "bland_altman_loa_upper": 0.7513408936307449,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      },
+      "site_06": {
+        "n_samples": 10,
+        "mae": 0.23646509001261906,
+        "rmse": 0.2640583008661599,
+        "bias": 0.07911178532175969,
+        "r2": 0.9538477936711575,
+        "rpiq": 7.85377330648095,
+        "bland_altman_mean_diff": 0.07911178532175969,
+        "bland_altman_std_diff": 0.2655562540938616,
+        "bland_altman_loa_lower": -0.441378472702209,
+        "bland_altman_loa_upper": 0.5996020433457283,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      },
+      "site_07": {
+        "n_samples": 10,
+        "mae": 0.07558138535860617,
+        "rmse": 0.10064083173619177,
+        "bias": 0.01108021222341642,
+        "r2": 0.9933528320615019,
+        "rpiq": 18.57138228241956,
+        "bland_altman_mean_diff": 0.01108021222341642,
+        "bland_altman_std_diff": 0.1054398507293061,
+        "bland_altman_loa_lower": -0.19558189520602354,
+        "bland_altman_loa_upper": 0.2177423196528564,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      },
+      "site_08": {
+        "n_samples": 10,
+        "mae": 0.15812013686294568,
+        "rmse": 0.18826833802021364,
+        "bias": -0.06280154842803745,
+        "r2": 0.9788782841297505,
+        "rpiq": 9.02461088183322,
+        "bland_altman_mean_diff": -0.06280154842803745,
+        "bland_altman_std_diff": 0.1870856387858966,
+        "bland_altman_loa_lower": -0.4294894004483948,
+        "bland_altman_loa_upper": 0.30388630359231983,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      }
+    },
+    "moisture_scenario": {
+      "dry": {
+        "n_samples": 11,
+        "mae": 0.3573847400112594,
+        "rmse": 0.46428506628433247,
+        "bias": -0.05768579080581635,
+        "r2": 0.8558578023326058,
+        "rpiq": 3.7848946153345926,
+        "bland_altman_mean_diff": -0.05768579080581635,
+        "bland_altman_std_diff": 0.4831731258515213,
+        "bland_altman_loa_lower": -1.004705117474798,
+        "bland_altman_loa_upper": 0.8893335358631653,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      },
+      "field_moist": {
+        "n_samples": 41,
+        "mae": 0.21059661108329786,
+        "rmse": 0.2485480023531441,
+        "bias": 0.009898109850625962,
+        "r2": 0.9604526872797775,
+        "rpiq": 7.596338752859854,
+        "bland_altman_mean_diff": 0.009898109850625962,
+        "bland_altman_std_diff": 0.25143605612063985,
+        "bland_altman_loa_lower": -0.4829165601458282,
+        "bland_altman_loa_upper": 0.5027127798470801,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      },
+      "wet": {
+        "n_samples": 28,
+        "mae": 0.09211230990224654,
+        "rmse": 0.12110094417503305,
+        "bias": -0.025270357772495727,
+        "r2": 0.9930429416513078,
+        "rpiq": 19.086049860759804,
+        "bland_altman_mean_diff": -0.025270357772495727,
+        "bland_altman_std_diff": 0.12060829397617404,
+        "bland_altman_loa_lower": -0.2616626139657968,
+        "bland_altman_loa_upper": 0.21112189842080537,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      }
+    },
+    "instrument_profile_id": {
+      "visnir_24ch_v1": {
+        "n_samples": 80,
+        "mae": 0.1893104733975246,
+        "rmse": 0.2577455048586386,
+        "bias": -0.011703640157727449,
+        "r2": 0.9624817590542447,
+        "rpiq": 7.880712353022952,
+        "bland_altman_mean_diff": -0.011703640157727449,
+        "bland_altman_std_diff": 0.25910414324158326,
+        "bland_altman_loa_lower": -0.5195477609112306,
+        "bland_altman_loa_upper": 0.4961404805957757,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      }
+    },
+    "soil_class_name": {
+      "humus_rich_calcareous": {
+        "n_samples": 40,
+        "mae": 0.17487338263283392,
+        "rmse": 0.22598249735799172,
+        "bias": 0.04061978416972069,
+        "r2": 0.9554639177634648,
+        "rpiq": 8.450235542180225,
+        "bland_altman_mean_diff": 0.04061978416972069,
+        "bland_altman_std_diff": 0.22513385704021768,
+        "bland_altman_loa_lower": -0.400642575629106,
+        "bland_altman_loa_upper": 0.48188214396854734,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      },
+      "humus_rich_non_calcareous": {
+        "n_samples": 22,
+        "mae": 0.25950443850904414,
+        "rmse": 0.3517469908941232,
+        "bias": -0.04088768425484932,
+        "r2": 0.86249878538517,
+        "rpiq": 4.442539822822637,
+        "bland_altman_mean_diff": -0.04088768425484932,
+        "bland_altman_std_diff": 0.3575838991358808,
+        "bland_altman_loa_lower": -0.7417521265611757,
+        "bland_altman_loa_upper": 0.659976758051477,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      },
+      "low_organic_calcareous": {
+        "n_samples": 14,
+        "mae": 0.14275506552463685,
+        "rmse": 0.17556556282189356,
+        "bias": -0.09953410837540286,
+        "r2": 0.8364016264142056,
+        "rpiq": 3.9967604888072796,
+        "bland_altman_mean_diff": -0.09953410837540286,
+        "bland_altman_std_diff": 0.15008387236279314,
+        "bland_altman_loa_lower": -0.3936984982064774,
+        "bland_altman_loa_upper": 0.1946302814556717,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      },
+      "low_organic_low_carbonate": {
+        "n_samples": 4,
+        "mae": 0.1105585004861806,
+        "rmse": 0.1720461553969365,
+        "bias": -0.06701900213617457,
+        "r2": 0.771139144202509,
+        "rpiq": 1.8761257143669927,
+        "bland_altman_mean_diff": -0.06701900213617457,
+        "bland_altman_std_diff": 0.18296933418668185,
+        "bland_altman_loa_lower": -0.425638897142071,
+        "bland_altman_loa_upper": 0.29160089286972185,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      }
+    }
+  },
+  "uncertainty_coverage": {},
+  "domain_envelope": {
+    "covariate_bounds": {
+      "ph": [
+        5.682191382293381,
+        7.666159937020178
+      ],
+      "moisture_volumetric_pct": [
+        2.9999607238463426,
+        35.43249138971515
+      ],
+      "temperature_c": [
+        13.38321619046726,
+        28.33849848160255
+      ],
+      "ec_ds_m": [
+        0.336056415806907,
+        1.9998566674246647
+      ]
+    },
+    "seen_instrument_profiles": [
+      "visnir_24ch_v1"
+    ],
+    "seen_moisture_scenarios": [
+      "dry",
+      "field_moist",
+      "wet"
+    ],
+    "seen_texture_classes": [
+      "clay_loam",
+      "loam"
+    ]
+  },
+  "reference_methods": {
+    "soc_pct": "dry_combustion_acid_pretreated_iso10694",
+    "sic_pct": "calcimeter_iso10693",
+    "tc_pct": "dry_combustion_dumas_iso10694"
+  },
+  "intended_use": "Standalone soil carbon prediction (SOC/SIC/TC on dry-matter % basis), uncertainty quantification, and physical carbon stock estimation when valid bulk density is supplied.",
+  "limitations": [
+    "Not a laboratory replacement or MRV certification statement without regional site calibration.",
+    "Requires matched InstrumentProfile wavelength grid and dry-matter reference calibration.",
+    "Carbon stock returns None whenever bulk_density is missing (ADR-004 / DEF-005)."
+  ],
+  "out_of_domain_policy": "Measurements outside the calibrated Mahalanobis/k-NN/covariate envelope are flagged with QualityFlag.OUT_OF_CALIBRATION_DOMAIN and confidence_score < 0.5.",
+  "recalibration_triggers": [
+    "Instrument lamp/detector replacement or reference drift exceeding calibration tolerance.",
+    "Deployment in unseen soil texture classes, moisture regimes, or carbonate provinces."
+  ],
+  "warning": "Model trained on synthetic records (`dataset_source='synthetic'`); pipeline verification only."
+}
