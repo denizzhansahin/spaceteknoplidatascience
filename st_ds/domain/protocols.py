@@ -54,10 +54,32 @@ class SignalQCProtocol(Protocol):
 class AnalyzerProtocol(Protocol):
     """Consumer-facing facade contract implemented by STSoilAnalyzer (Section 25)."""
 
-    def predict(self, measurement: Measurement) -> PredictionReport: ...
+    def predict(
+        self,
+        measurement: Measurement,
+        *,
+        include_xai: bool = False,
+        include_stock: bool = True,
+        stock_cov_matrix: Any = None,
+        alpha: float | None = None,
+        correlation_id: str | None = None,
+    ) -> PredictionReport: ...
 
-    def predict_batch(self, measurements: Sequence[Measurement]) -> list[PredictionReport]: ...
+    def predict_batch(
+        self,
+        measurements: Sequence[Measurement],
+        *,
+        fail_fast: bool = False,
+        include_xai: bool = False,
+        include_stock: bool = True,
+        alpha: float | None = None,
+        correlation_id: str | None = None,
+    ) -> Any: ...
 
-    def explain(self, measurement: Measurement, result: PredictionReport | None = None) -> dict[str, Any]: ...
+    def explain(
+        self,
+        measurements: Measurement | Sequence[Measurement],
+        report: PredictionReport | None = None,
+    ) -> Any: ...
 
     def inspect_artifact(self) -> dict[str, Any]: ...

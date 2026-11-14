@@ -10,9 +10,10 @@
 
 | Vitrin Klasörü / Showcase Folder | Dil / Language | İçerik Özeti / Highlights | Ana Rapor / Primary PDF |
 | :--- | :--- | :--- | :--- |
-| `example_full_run_tr/` | Türkçe (`tr`) | Varsayılan `TARGET=soc_pct` + `MODEL=auto` + aktif EPO + 26 PNG + 5 CSV/MD tablo + interaktif 3D HTML + web pano + PDF raporlar | [00_STDS_FULL_ANALYSIS_REPORT.pdf](example_full_run_tr/00_STDS_FULL_ANALYSIS_REPORT.pdf) |
-| `example_full_run_en/` | English (`en`) | Same complete end-to-end showcase localized in English (`TARGET=soc_pct`, `MODEL=auto`, EPO active) | [00_STDS_FULL_ANALYSIS_REPORT.pdf](example_full_run_en/00_STDS_FULL_ANALYSIS_REPORT.pdf) |
-| `example_tc_plsr_tr/` | Türkçe (`tr`) | Farklı hedef ve sabit model örneği: **`TARGET=tc_pct` + `MODEL=plsr`** (PDF 1. sayfada seçilen hedef ve modelin nasıl değiştiğini gösterir) | [00_STDS_FULL_ANALYSIS_REPORT.pdf](example_tc_plsr_tr/00_STDS_FULL_ANALYSIS_REPORT.pdf) |
+| `20261114_005026_full_run/` | Türkçe (`tr`) | Tam uçtan uca koşum: `TARGET=soc_pct`, `MODEL=auto` (`kernel_ridge_rbf`, `OOF R²=0.779`, `RMSE=0.6083%`), aktif `EPO` (**%99.6** bastırma), tam `SIC/TC`, `Semivariogram` + `2D/3D Ordinary Kriging`, **26 PNG** + **4 3D** + **5 CSV/MD** + **3 HTML** (`index.html`) + **28 sf. Ana PDF** & **6 sf. Tahmin PDF** | [00_STDS_FULL_ANALYSIS_REPORT.pdf](20261114_005026_full_run/00_STDS_FULL_ANALYSIS_REPORT.pdf) |
+| `20261114_005111_full_run/` | English (`en`) | Same complete end-to-end showcase localized in English (`TARGET=soc_pct`, `MODEL=auto`, `kernel_ridge_rbf`, `OOF R²=0.779`, `RMSE=0.6083%`, active `EPO` **99.6%** suppression, full `SIC/TC` & `2D/3D Kriging`, 28-page main PDF + 6-page prediction PDF + 1-page training PDF) | [00_STDS_FULL_ANALYSIS_REPORT.pdf](20261114_005111_full_run/00_STDS_FULL_ANALYSIS_REPORT.pdf) |
+
+> **Yeniden Üretme / Reproduce:** `STDS_LANG=tr STDS_RUNS_DIR=runs_examples bash scripts/03_run_full_pipeline.sh` veya `STDS_LANG=en STDS_RUNS_DIR=runs_examples bash scripts/03_run_full_pipeline.sh` (alternatif hedef/model için ör. `TARGET=tc_pct MODEL=plsr` eklenebilir).
 
 ---
 

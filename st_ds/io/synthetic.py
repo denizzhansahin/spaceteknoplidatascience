@@ -51,10 +51,10 @@ class SyntheticGeneratorV2:
     """Deterministic generator for synthetic soil spectra, covariates, and paired wet/dry sets."""
 
     PROVISIONAL_CLASSES: tuple[tuple[int, str], ...] = (
-        (0, "low_organic_low_carbonate"),
-        (1, "low_organic_calcareous"),
-        (2, "humus_rich_non_calcareous"),
-        (3, "humus_rich_calcareous"),
+        (0, "low_carbon_mineral"),
+        (1, "calcareous_mineral"),
+        (2, "humic_mineral"),
+        (3, "organic_rich"),
     )
 
     def __init__(self, config: SyntheticConfig | None = None) -> None:

@@ -108,6 +108,8 @@ def align_wavelengths(
             dst_valid[idx] = bool(src_valid[-1])
         elif np.isclose(src_wl[pos], w, atol=tol_nm):
             dst_valid[idx] = bool(src_valid[pos])
+        elif np.isclose(src_wl[pos - 1], w, atol=tol_nm):
+            dst_valid[idx] = bool(src_valid[pos - 1])
         else:
             dst_valid[idx] = bool(src_valid[pos - 1] and src_valid[pos])
 

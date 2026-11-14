@@ -1,0 +1,333 @@
+{
+  "schema_version": "1.0.0",
+  "artifact_id": "stds_kernel_ridge_rbf_stds_synth_20261114_005114",
+  "semantic_version": "0.1.0",
+  "model_name": "kernel_ridge_rbf",
+  "model_family": "kernel_method",
+  "target_names": [
+    "soc_pct",
+    "sic_pct",
+    "tc_pct"
+  ],
+  "target_schema": {
+    "targets": [
+      "soc_pct",
+      "sic_pct",
+      "tc_pct"
+    ],
+    "carbon_unit": "pct",
+    "dry_matter_basis": true,
+    "enforce_non_negative": true,
+    "enforce_tc_closure": true,
+    "closure_tolerance_pct": 0.05,
+    "taxonomy_version": "provisional_taxonomy_v0",
+    "class_labels": [
+      "low_carbon_mineral",
+      "calcareous_mineral",
+      "humic_mineral",
+      "organic_rich"
+    ]
+  },
+  "instrument_profile_id": "visnir_24ch_v1",
+  "calibration_id": "cal_synth_v2",
+  "dataset_source": "synthetic",
+  "is_synthetic_smoke_only": true,
+  "validation_metrics": {
+    "n_samples": 80,
+    "mae": 0.4895168896982865,
+    "rmse": 0.608337815654125,
+    "bias": 0.028345524223334573,
+    "r2": 0.7793192006558386,
+    "rpiq": 2.9275942650729467,
+    "bland_altman_mean_diff": 0.028345524223334573,
+    "bland_altman_std_diff": 0.6115110392299453,
+    "bland_altman_loa_lower": -1.1702161126673583,
+    "bland_altman_loa_upper": 1.2269071611140274,
+    "max_abs_closure_residual": null,
+    "mean_abs_closure_residual": null
+  },
+  "subgroup_metrics": {
+    "site_id": {
+      "site_01": {
+        "n_samples": 10,
+        "mae": 0.43077700248424405,
+        "rmse": 0.5010348534194574,
+        "bias": 0.16133704616482078,
+        "r2": 0.7543091884328548,
+        "rpiq": 3.812411831582171,
+        "bland_altman_mean_diff": 0.16133704616482078,
+        "bland_altman_std_diff": 0.5000069798133574,
+        "bland_altman_loa_lower": -0.8186766342693597,
+        "bland_altman_loa_upper": 1.1413507265990013,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      },
+      "site_02": {
+        "n_samples": 10,
+        "mae": 0.2746682596192991,
+        "rmse": 0.3279008487694685,
+        "bias": 0.16652705099781448,
+        "r2": 0.8871290768847409,
+        "rpiq": 3.996465737209888,
+        "bland_altman_mean_diff": 0.16652705099781448,
+        "bland_altman_std_diff": 0.2977465512622534,
+        "bland_altman_loa_lower": -0.41705618947620215,
+        "bland_altman_loa_upper": 0.7501102914718312,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      },
+      "site_03": {
+        "n_samples": 10,
+        "mae": 0.4347618566207241,
+        "rmse": 0.5025683576051951,
+        "bias": 0.1539106028483767,
+        "r2": 0.6843970420577092,
+        "rpiq": 1.4509022139548695,
+        "bland_altman_mean_diff": 0.1539106028483767,
+        "bland_altman_std_diff": 0.5042998230735721,
+        "bland_altman_loa_lower": -0.8345170503758246,
+        "bland_altman_loa_upper": 1.142338256072578,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      },
+      "site_04": {
+        "n_samples": 10,
+        "mae": 0.4193253120016423,
+        "rmse": 0.47046307730017856,
+        "bias": 0.35852349369894554,
+        "r2": 0.8264893301096221,
+        "rpiq": 3.0891477087429333,
+        "bland_altman_mean_diff": 0.35852349369894554,
+        "bland_altman_std_diff": 0.3211029803118826,
+        "bland_altman_loa_lower": -0.2708383477123444,
+        "bland_altman_loa_upper": 0.9878853351102355,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      },
+      "site_05": {
+        "n_samples": 10,
+        "mae": 0.49173581297466945,
+        "rmse": 0.6141042136030825,
+        "bias": 0.08879744278420013,
+        "r2": 0.6896661800189209,
+        "rpiq": 2.8772572809654853,
+        "bland_altman_mean_diff": 0.08879744278420013,
+        "bland_altman_std_diff": 0.6405197536376629,
+        "bland_altman_loa_lower": -1.166621274345619,
+        "bland_altman_loa_upper": 1.3442161599140194,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      },
+      "site_06": {
+        "n_samples": 10,
+        "mae": 0.8105259521960184,
+        "rmse": 0.9911043441932625,
+        "bias": -0.5964707095421213,
+        "r2": 0.39753626806758624,
+        "rpiq": 2.420919272577386,
+        "bland_altman_mean_diff": -0.5964707095421213,
+        "bland_altman_std_diff": 0.8343397347850544,
+        "bland_altman_loa_lower": -2.2317765897208277,
+        "bland_altman_loa_upper": 1.0388351706365853,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      },
+      "site_07": {
+        "n_samples": 10,
+        "mae": 0.4875296300622217,
+        "rmse": 0.5407814820179344,
+        "bias": 0.008559204550492683,
+        "r2": 0.8412033739065956,
+        "rpiq": 4.776116740049228,
+        "bland_altman_mean_diff": 0.008559204550492683,
+        "bland_altman_std_diff": 0.5699623294676552,
+        "bland_altman_loa_lower": -1.1085669612061115,
+        "bland_altman_loa_upper": 1.125685370307097,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      },
+      "site_08": {
+        "n_samples": 10,
+        "mae": 0.5668112916274735,
+        "rmse": 0.6901285488717263,
+        "bias": -0.11441993771585253,
+        "r2": 0.35701286950351874,
+        "rpiq": 2.170412225931923,
+        "bland_altman_mean_diff": -0.11441993771585253,
+        "bland_altman_std_diff": 0.7173914875907444,
+        "bland_altman_loa_lower": -1.5205072533937116,
+        "bland_altman_loa_upper": 1.2916673779620065,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      }
+    },
+    "moisture_scenario": {
+      "dry": {
+        "n_samples": 16,
+        "mae": 0.5487396733667539,
+        "rmse": 0.6987503641930807,
+        "bias": 0.07751324916635177,
+        "r2": 0.49528271736725527,
+        "rpiq": 1.1966639301695758,
+        "bland_altman_mean_diff": 0.07751324916635177,
+        "bland_altman_std_diff": 0.7172122086067325,
+        "bland_altman_loa_lower": -1.328222679702844,
+        "bland_altman_loa_upper": 1.4832491780355475,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      },
+      "field_moist": {
+        "n_samples": 36,
+        "mae": 0.48132207975922664,
+        "rmse": 0.5906039120171882,
+        "bias": -0.005907276825211922,
+        "r2": 0.7931724044260431,
+        "rpiq": 3.9009335000511216,
+        "bland_altman_mean_diff": -0.005907276825211922,
+        "bland_altman_std_diff": 0.5989517285328858,
+        "bland_altman_loa_lower": -1.179852664749668,
+        "bland_altman_loa_upper": 1.1680381110992442,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      },
+      "wet": {
+        "n_samples": 28,
+        "mae": 0.4662114832379536,
+        "rmse": 0.5743534060447867,
+        "bias": 0.044288997032598795,
+        "r2": 0.8321587953263345,
+        "rpiq": 3.488145219058513,
+        "bland_altman_mean_diff": 0.044288997032598795,
+        "bland_altman_std_diff": 0.5831513669759125,
+        "bland_altman_loa_lower": -1.0986876822401896,
+        "bland_altman_loa_upper": 1.1872656763053873,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      }
+    },
+    "instrument_profile_id": {
+      "visnir_24ch_v1": {
+        "n_samples": 80,
+        "mae": 0.4895168896982865,
+        "rmse": 0.608337815654125,
+        "bias": 0.028345524223334573,
+        "r2": 0.7793192006558386,
+        "rpiq": 2.9275942650729467,
+        "bland_altman_mean_diff": 0.028345524223334573,
+        "bland_altman_std_diff": 0.6115110392299453,
+        "bland_altman_loa_lower": -1.1702161126673583,
+        "bland_altman_loa_upper": 1.2269071611140274,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      }
+    },
+    "soil_class_name": {
+      "calcareous_mineral": {
+        "n_samples": 18,
+        "mae": 0.4010591869247373,
+        "rmse": 0.4453774365326082,
+        "bias": 0.2465299758454917,
+        "r2": 0.06981612126849746,
+        "rpiq": 1.124193818356364,
+        "bland_altman_mean_diff": 0.2465299758454917,
+        "bland_altman_std_diff": 0.38167684018533243,
+        "bland_altman_loa_lower": -0.5015566309177599,
+        "bland_altman_loa_upper": 0.9946165826087432,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      },
+      "humic_mineral": {
+        "n_samples": 11,
+        "mae": 0.5847810635984908,
+        "rmse": 0.7589440865193414,
+        "bias": 0.11390858963957351,
+        "r2": 0.4001243362075222,
+        "rpiq": 2.1509518704339396,
+        "bland_altman_mean_diff": 0.11390858963957351,
+        "bland_altman_std_diff": 0.7869708099007872,
+        "bland_altman_loa_lower": -1.4285541977659693,
+        "bland_altman_loa_upper": 1.6563713770451163,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      },
+      "low_carbon_mineral": {
+        "n_samples": 3,
+        "mae": 0.6187805473127712,
+        "rmse": 0.6537742530380508,
+        "bias": 0.6187805473127712,
+        "r2": -5.452645976661465,
+        "rpiq": 0.48113027964177935,
+        "bland_altman_mean_diff": 0.6187805473127712,
+        "bland_altman_std_diff": 0.2584513731906895,
+        "bland_altman_loa_lower": 0.11221585585901983,
+        "bland_altman_loa_upper": 1.1253452387665226,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      },
+      "organic_rich": {
+        "n_samples": 48,
+        "mae": 0.4927781764519988,
+        "rmse": 0.6194297280898157,
+        "bias": -0.10998403656928558,
+        "r2": 0.6035903777472078,
+        "rpiq": 2.7948165764809056,
+        "bland_altman_mean_diff": -0.10998403656928558,
+        "bland_altman_std_diff": 0.6160381583163524,
+        "bland_altman_loa_lower": -1.3174188268693365,
+        "bland_altman_loa_upper": 1.0974507537307652,
+        "max_abs_closure_residual": null,
+        "mean_abs_closure_residual": null
+      }
+    }
+  },
+  "uncertainty_coverage": {},
+  "domain_envelope": {
+    "covariate_bounds": {
+      "ph": [
+        5.627175857622832,
+        7.890726366345921
+      ],
+      "moisture_volumetric_pct": [
+        2.6607838007398774,
+        35.32938311746674
+      ],
+      "temperature_c": [
+        13.489384033953055,
+        28.168455237743924
+      ],
+      "ec_ds_m": [
+        0.31787380295941603,
+        2.0437270037509934
+      ]
+    },
+    "seen_instrument_profiles": [
+      "visnir_24ch_v1"
+    ],
+    "seen_moisture_scenarios": [
+      "dry",
+      "field_moist",
+      "wet"
+    ],
+    "seen_texture_classes": [
+      "clay_loam",
+      "loam"
+    ]
+  },
+  "reference_methods": {
+    "soc_pct": "dry_combustion_acid_pretreated_iso10694",
+    "sic_pct": "calcimeter_iso10693",
+    "tc_pct": "dry_combustion_dumas_iso10694"
+  },
+  "intended_use": "Standalone soil carbon prediction (SOC/SIC/TC on dry-matter % basis), uncertainty quantification, and physical carbon stock estimation when valid bulk density is supplied.",
+  "limitations": [
+    "Not a laboratory replacement or MRV certification statement without regional site calibration.",
+    "Requires matched InstrumentProfile wavelength grid and dry-matter reference calibration.",
+    "Carbon stock returns None whenever bulk_density is missing (ADR-004 / DEF-005)."
+  ],
+  "out_of_domain_policy": "Measurements outside the calibrated Mahalanobis/k-NN/covariate envelope are flagged with QualityFlag.OUT_OF_CALIBRATION_DOMAIN and confidence_score < 0.5.",
+  "recalibration_triggers": [
+    "Instrument lamp/detector replacement or reference drift exceeding calibration tolerance.",
+    "Deployment in unseen soil texture classes, moisture regimes, or carbonate provinces."
+  ],
+  "warning": "Model trained on synthetic records (`dataset_source='synthetic'`); pipeline verification only."
+}

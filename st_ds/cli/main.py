@@ -292,7 +292,7 @@ def _cmd_train(args: argparse.Namespace) -> int:
         soc_vals = (
             _extract_target_vector(ds.records, "soc_pct")
             if "soc_pct" in final_target_names
-            else y_all
+            else None
         )
         sic_vals = (
             _extract_target_vector(ds.records, "sic_pct")

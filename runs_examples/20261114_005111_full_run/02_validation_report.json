@@ -1,0 +1,11 @@
+{
+  "command": "dataset validate",
+  "dataset_id": "stds_synth_20261114_005114",
+  "dataset_source": "synthetic",
+  "target": "soc_pct",
+  "is_valid": true,
+  "n_records": 80,
+  "n_errors": 0,
+  "errors": [],
+  "warnings": []
+}

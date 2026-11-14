@@ -163,16 +163,25 @@ def plot_02_chemometric_pipeline_stages(
     X_sub = X_raw[idx]
     X_abs = to_absorbance(X_sub)
     X_snv = snv_transform(X_abs)
-    window = min(7, X_raw.shape[1] if X_raw.shape[1] % 2 == 1 else max(3, X_raw.shape[1] - 1))
-    window = max(5, window) if X_raw.shape[1] >= 5 else 3
-    poly = min(2, window - 1)
-    X_sg = savgol_derivative(X_snv, wl, window=window, polyorder=poly, deriv=1)
+    n_bands = X_raw.shape[1]
+    if n_bands >= 3:
+        window = min(7, n_bands if n_bands % 2 == 1 else max(3, n_bands - 1))
+        window = max(5, window) if n_bands >= 5 else 3
+        poly = min(2, window - 1)
+        X_sg = savgol_derivative(X_snv, wl, window=window, polyorder=poly, deriv=1)
+        sg_label_tr = f"4) Savitzky-Golay 1. Türev (w={window})"
+        sg_label_en = f"4) Savitzky-Golay 1st Deriv (w={window})"
+    else:
+        window = n_bands
+        X_sg = np.gradient(X_snv, wl, axis=1) if n_bands >= 2 else np.zeros_like(X_snv)
+        sg_label_tr = "4) Sonlu Fark 1. Türev"
+        sg_label_en = "4) Finite Difference 1st Deriv"
 
     stages = [
         (pick_text(config.lang, tr="1) Ham Spektrum R(λ)", en="1) Raw Spectrum R(λ)"), X_sub, pick_text(config.lang, tr="Ham Yansıma", en="Raw Reflectance"), PALETTE["navy"]),
         (pick_text(config.lang, tr="2) Görünür Absorbans: log10(1 / R)", en="2) Apparent Absorbance: log10(1 / R)"), X_abs, pick_text(config.lang, tr="Absorbans (AU)", en="Absorbance (AU)"), PALETTE["blue"]),
         (pick_text(config.lang, tr="3) Standart Normal Variate (SNV)", en="3) Standard Normal Variate (SNV)"), X_snv, pick_text(config.lang, tr="SNV Normalize", en="SNV Normalized"), PALETTE["teal"]),
-        (pick_text(config.lang, tr=f"4) Savitzky-Golay 1. Türev (w={window})", en=f"4) Savitzky-Golay 1st Deriv (w={window})"), X_sg, "dA / dλ", PALETTE["vermilion"]),
+        (pick_text(config.lang, tr=sg_label_tr, en=sg_label_en), X_sg, "dA / dλ", PALETTE["vermilion"]),
     ]
 
     fig, axes = plt.subplots(2, 2, figsize=(13.2, 8.2), sharex=True)

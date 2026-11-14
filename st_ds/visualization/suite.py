@@ -180,8 +180,9 @@ def _build_in_memory_analyzer(
     )
     fused = fusion.build_feature_vector(dataset.records, chemometric_pipeline=chemo)
     y_all = _extract_target_vector(dataset.records, config.target_name)
+    all_carbon_targets = ("soc_pct", "sic_pct", "tc_pct")
     has_multitarget = (
-        config.target_name == "soc_pct"
+        config.target_name in all_carbon_targets
         and all(
             r.reference is not None
             and r.reference.soc_pct is not None
@@ -190,7 +191,11 @@ def _build_in_memory_analyzer(
             for r in dataset.records
         )
     )
-    target_names: tuple[str, ...] = ("soc_pct", "sic_pct", "tc_pct") if has_multitarget else (config.target_name,)
+    if has_multitarget:
+        ordered_targets = tuple([config.target_name] + [t for t in all_carbon_targets if t != config.target_name])
+        target_names: tuple[str, ...] = ordered_targets
+    else:
+        target_names = (config.target_name,)
 
     trainer = STSoilTrainer(t_cfg)
     factories = trainer.default_model_factories(include_optional=True)
@@ -222,19 +227,20 @@ def _build_in_memory_analyzer(
     groups = np.asarray([r.site_id for r in dataset.records], dtype=str)
     if isinstance(model, STSoilHybridNetRegressor):
         if has_multitarget:
+            y_soc = np.asarray([float(r.reference.soc_pct) for r in dataset.records], dtype=float)
             y_sic = np.asarray([float(r.reference.sic_pct) for r in dataset.records], dtype=float)
             y_tc = np.asarray([float(r.reference.tc_pct) for r in dataset.records], dtype=float)
-            model.fit_multitask(fused.X_spectral, fused.X_covariates, soc=y_all, sic=y_sic, tc=y_tc)
+            model.fit_multitask(fused.X_spectral, fused.X_covariates, soc=y_soc, sic=y_sic, tc=y_tc)
+        elif config.target_name == "sic_pct":
+            model.fit_multitask(fused.X_spectral, fused.X_covariates, sic=y_all)
+        elif config.target_name == "tc_pct":
+            model.fit_multitask(fused.X_spectral, fused.X_covariates, tc=y_all)
         else:
             model.fit_multitask(fused.X_spectral, fused.X_covariates, soc=y_all)
     else:
         if has_multitarget:
             y_fit = np.column_stack(
-                [
-                    y_all,
-                    np.asarray([float(r.reference.sic_pct) for r in dataset.records], dtype=float),
-                    np.asarray([float(r.reference.tc_pct) for r in dataset.records], dtype=float),
-                ]
+                [_extract_target_vector(dataset.records, tname) for tname in target_names]
             )
         else:
             y_fit = y_all

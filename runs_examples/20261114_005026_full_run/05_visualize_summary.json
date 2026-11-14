@@ -1,0 +1,12 @@
+{
+  "command": "visualize",
+  "output_dir": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261114_005026_full_run/05_visualization_suite",
+  "manifest_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261114_005026_full_run/05_visualization_suite/viz_manifest.json",
+  "dashboard_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261114_005026_full_run/05_visualization_suite/index.html",
+  "pdf_report_path": "/Users/denizhan/Desktop/SpaceTeknopoliDataScience/runs_examples/20261114_005026_full_run/05_visualization_suite/reports/stds_analysis_report.pdf",
+  "lang": "tr",
+  "n_plots": 26,
+  "n_3d_plots": 4,
+  "n_tables": 5,
+  "n_interactive_3d": 3
+}

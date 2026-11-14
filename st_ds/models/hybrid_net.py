@@ -269,9 +269,23 @@ class STSoilHybridNetRegressor(BaseSoilRegressor):
         self._n_targets = y_2d.shape[1]
 
         X_spec, X_cov = self._split_fused(X_arr)
-        soc = y_2d[:, 0]
-        sic = y_2d[:, 1] if y_2d.shape[1] >= 2 else None
-        tc = y_2d[:, 2] if y_2d.shape[1] >= 3 else None
+        soc: np.ndarray | None = None
+        sic: np.ndarray | None = None
+        tc: np.ndarray | None = None
+
+        known_carbon = {"soc_pct", "sic_pct", "tc_pct"}
+        if len(self.target_names) == y_2d.shape[1] and any(n in known_carbon for n in self.target_names):
+            for col_idx, name in enumerate(self.target_names):
+                if name == "sic_pct":
+                    sic = y_2d[:, col_idx]
+                elif name == "tc_pct":
+                    tc = y_2d[:, col_idx]
+                else:
+                    soc = y_2d[:, col_idx]
+        else:
+            soc = y_2d[:, 0]
+            sic = y_2d[:, 1] if y_2d.shape[1] >= 2 else None
+            tc = y_2d[:, 2] if y_2d.shape[1] >= 3 else None
 
         return self._train_internal(X_spec, X_cov, soc=soc, sic=sic, tc=tc, soil_class=None)
 
@@ -299,8 +313,22 @@ class STSoilHybridNetRegressor(BaseSoilRegressor):
 
         self.n_spectral_features = X_s.shape[1]
         self._n_features_in = X_s.shape[1] + n_cov
-        self._is_1d_target = sic is None and tc is None
-        self._n_targets = 1 if self._is_1d_target else (3 if tc is not None else 2)
+        supplied_names = tuple(
+            name
+            for name, arr in (("soc_pct", soc), ("sic_pct", sic), ("tc_pct", tc))
+            if arr is not None
+        )
+        if not supplied_names:
+            raise ModelInferenceError("fit_multitask requires at least one non-None target array.")
+        # Preserve explicit non-default target_names (e.g. trainer single-target or reordered CLI multitarget)
+        if self.target_names == ("soc_pct",) and len(supplied_names) > 1:
+            self.target_names = supplied_names
+        elif self.target_names == ("soc_pct",) and supplied_names != ("soc_pct",):
+            self.target_names = supplied_names
+
+        effective_names = tuple(self.target_names) if self.target_names else supplied_names
+        self._n_targets = len(effective_names)
+        self._is_1d_target = self._n_targets == 1
         return self._train_internal(X_s, X_c, soc=soc, sic=sic, tc=tc, soil_class=soil_class)
 
     def _train_internal(
@@ -484,7 +512,17 @@ class STSoilHybridNetRegressor(BaseSoilRegressor):
         assert pred.soc_std_pct is not None and pred.sic_mean_pct is not None and pred.sic_std_pct is not None
         assert pred.tc_mean_pct is not None and pred.tc_std_pct is not None
 
-        if self._n_targets == 1:
+        head_map: dict[str, tuple[np.ndarray, np.ndarray]] = {
+            "soc_pct": (pred.soc_mean_pct, pred.soc_std_pct),
+            "sic_pct": (pred.sic_mean_pct, pred.sic_std_pct),
+            "tc_pct": (pred.tc_mean_pct, pred.tc_std_pct),
+        }
+        if len(self.target_names) == self._n_targets and self.target_names:
+            mean_cols = [head_map.get(t, head_map["soc_pct"])[0] for t in self.target_names]
+            std_cols = [head_map.get(t, head_map["soc_pct"])[1] for t in self.target_names]
+            means = np.column_stack(mean_cols)
+            stds = np.column_stack(std_cols)
+        elif self._n_targets == 1:
             means = pred.soc_mean_pct[:, None]
             stds = pred.soc_std_pct[:, None]
         elif self._n_targets == 2:

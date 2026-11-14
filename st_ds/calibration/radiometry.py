@@ -88,14 +88,14 @@ def calibrate_reflectance(
     if dark is None:
         if raw.dark_reference is None:
             raise CalibrationError("Dark reference is missing; provide `dark` or `raw.dark_reference`.")
-        dark_arr = np.asarray(raw.dark_reference, dtype=float)
+        dark_arr = _extract_1d_reference(raw.dark_reference, "dark", raw.n_bands)
     else:
         dark_arr = _extract_1d_reference(dark, "dark", raw.n_bands)
 
     if white is None:
         if raw.white_reference is None:
             raise CalibrationError("White reference is missing; provide `white` or `raw.white_reference`.")
-        white_arr = np.asarray(raw.white_reference, dtype=float)
+        white_arr = _extract_1d_reference(raw.white_reference, "white", raw.n_bands)
     else:
         white_arr = _extract_1d_reference(white, "white", raw.n_bands)
 

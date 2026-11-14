@@ -34,6 +34,7 @@ from st_ds.features.fusion import FusedFeatures
 from st_ds.models.hybrid_net import STSoilHybridNetRegressor
 from st_ds.signal.qc import evaluate_signal_qc
 from st_ds.xai.engine import SoilXAIEngine, XAIExplanationReport
+from st_ds.xai.hsic import compute_feature_hsic_ranking
 
 
 @dataclass(frozen=True)
@@ -170,6 +171,12 @@ class STSoilAnalyzer:
         )
         bg_x = reference_X if reference_X is not None else self._artifact.background_features
         bg_y = reference_y if reference_y is not None else self._artifact.background_targets
+        if bg_y is not None:
+            bg_y_arr = np.asarray(bg_y, dtype=float)
+            if bg_y_arr.ndim == 2:
+                bg_y = bg_y_arr[:, 0]
+            else:
+                bg_y = bg_y_arr.reshape(-1)
 
         # If caller invokes single-sample explain without stored background data, pass only sample vector (B=1 -> insufficient_sample_count).
         report = self._xai_engine.explain(
@@ -279,30 +286,41 @@ class STSoilAnalyzer:
         custom_pred_stds: dict[str, float] = {}
 
         if isinstance(model, STSoilHybridNetRegressor):
-            has_soc_pred = not is_custom_target
+            trained_targets = set(model.target_names or ("soc_pct",))
+            has_soc_pred = ("soc_pct" in trained_targets) and not is_custom_target
+            has_sic_pred = ("sic_pct" in trained_targets) and not is_custom_target
+            has_tc_pred = ("tc_pct" in trained_targets) and not is_custom_target
             struct = model.predict_structured(fused.X_spectral, fused.X_covariates)
-            soc_pct = float(struct.soc_mean_pct[0])
-            soc_std = float(struct.soc_std_pct[0]) if struct.soc_std_pct is not None else 0.1
-            sic_pct = float(struct.sic_mean_pct[0]) if struct.sic_mean_pct is not None else None
-            sic_std = float(struct.sic_std_pct[0]) if struct.sic_std_pct is not None else None
-            tc_pct = float(struct.tc_mean_pct[0]) if struct.tc_mean_pct is not None else None
-            tc_std = float(struct.tc_std_pct[0]) if struct.tc_std_pct is not None else None
+            soc_pct = float(struct.soc_mean_pct[0]) if has_soc_pred else 0.0
+            soc_std = float(struct.soc_std_pct[0]) if (has_soc_pred and struct.soc_std_pct is not None) else 0.1
+            sic_pct = float(struct.sic_mean_pct[0]) if (has_sic_pred and struct.sic_mean_pct is not None) else None
+            sic_std = float(struct.sic_std_pct[0]) if (has_sic_pred and struct.sic_std_pct is not None) else None
+            tc_pct = float(struct.tc_mean_pct[0]) if (has_tc_pred and struct.tc_mean_pct is not None) else None
+            tc_std = float(struct.tc_std_pct[0]) if (has_tc_pred and struct.tc_std_pct is not None) else None
             closure_residual_pct = (
                 float(struct.closure_residual_pct[0])
-                if struct.closure_residual_pct is not None
+                if (has_soc_pred and has_sic_pred and has_tc_pred and struct.closure_residual_pct is not None)
                 else None
             )
             if struct.class_probs is not None:
                 hybrid_class_probs = [float(p) for p in struct.class_probs[0].tolist()]
             if primary_target == "sic_pct" and sic_pct is not None:
-                primary_mean, primary_std = sic_pct, (sic_std or soc_std)
+                primary_mean = sic_pct
+                primary_std = sic_std if sic_std is not None else (
+                    float(struct.sic_std_pct[0]) if struct.sic_std_pct is not None else soc_std
+                )
             elif primary_target == "tc_pct" and tc_pct is not None:
-                primary_mean, primary_std = tc_pct, (tc_std or soc_std)
+                primary_mean = tc_pct
+                primary_std = tc_std if tc_std is not None else (
+                    float(struct.tc_std_pct[0]) if struct.tc_std_pct is not None else soc_std
+                )
+            elif is_custom_target:
+                primary_mean = float(struct.soc_mean_pct[0])
+                primary_std = float(struct.soc_std_pct[0]) if struct.soc_std_pct is not None else 0.1
+                custom_pred_vals[primary_target] = primary_mean
+                custom_pred_stds[f"{primary_target}_std"] = primary_std
             else:
                 primary_mean, primary_std = soc_pct, soc_std
-                if is_custom_target:
-                    custom_pred_vals[primary_target] = primary_mean
-                    custom_pred_stds[f"{primary_target}_std"] = primary_std
         else:
             mean_arr, std_arr = model.predict_distribution(fused.X_fused)
             mean_2d = np.atleast_2d(np.asarray(mean_arr, dtype=np.float64))
@@ -336,21 +354,21 @@ class STSoilAnalyzer:
                 custom_pred_vals.setdefault(primary_target, primary_mean)
                 custom_pred_stds.setdefault(f"{primary_target}_std", primary_std)
             elif len(preds_by_name) > 1 or mean_2d.shape[1] > 1:
-                has_soc_pred = ("soc_pct" in preds_by_name) or (primary_target != "sic_pct")
-                soc_pct = preds_by_name.get("soc_pct", primary_mean)
+                has_soc_pred = "soc_pct" in preds_by_name
+                soc_pct = preds_by_name.get("soc_pct", 0.0)
                 soc_std = stds_by_name.get("soc_pct", primary_std)
                 sic_pct = preds_by_name.get("sic_pct")
                 sic_std = stds_by_name.get("sic_pct")
                 tc_pct = preds_by_name.get("tc_pct")
                 tc_std = stds_by_name.get("tc_pct")
             else:
-                has_soc_pred = primary_target != "sic_pct"
+                has_soc_pred = primary_target == "soc_pct"
                 if primary_target == "sic_pct":
                     sic_pct, sic_std = primary_mean, primary_std
                     soc_pct, soc_std = 0.0, primary_std
                 elif primary_target == "tc_pct":
                     tc_pct, tc_std = primary_mean, primary_std
-                    soc_pct, soc_std = primary_mean, primary_std
+                    soc_pct, soc_std = 0.0, primary_std
                 else:
                     soc_pct, soc_std = primary_mean, primary_std
         timings["inference_ms"] = (time.perf_counter() - t2) * 1000.0
@@ -411,8 +429,12 @@ class STSoilAnalyzer:
             fraction_closure = None
 
         # Compute single-layer stock only for soil carbon targets when bulk_density is present
-        stock_carbon_val = tc_pct if (primary_target == "tc_pct" and tc_pct is not None) else soc_pct
-        stock_carbon_std = tc_std if (primary_target == "tc_pct" and tc_std is not None) else soc_std
+        if primary_target == "tc_pct" and tc_pct is not None:
+            stock_carbon_val, stock_carbon_std = tc_pct, tc_std
+        elif primary_target == "sic_pct" and sic_pct is not None:
+            stock_carbon_val, stock_carbon_std = sic_pct, sic_std
+        else:
+            stock_carbon_val, stock_carbon_std = soc_pct, soc_std
         if include_stock and not is_custom_target:
             stock_res = compute_layer_stock(
                 carbon_value=stock_carbon_val,
@@ -466,9 +488,9 @@ class STSoilAnalyzer:
         }
 
         # Stage 6: Provisional Soil Classification (OD-005; soil carbon targets only)
-        if not is_custom_target:
+        if not is_custom_target and (has_soc_pred or sic_pct is not None):
             cls_res = classify_soil_provisional(
-                soc=soc_pct if primary_target != "sic_pct" else 0.0,
+                soc=soc_pct if has_soc_pred else 0.0,
                 sic=sic_pct or 0.0,
                 unit="pct",
             )
@@ -559,6 +581,7 @@ class STSoilAnalyzer:
             "correlation_id": corr_id,
             "sample_id": measurement.sample_id,
             "site_id": measurement.site_id,
+            "dataset_source": measurement.dataset_source,
             "timestamp_utc": measurement.timestamp_utc,
             "instrument_id": measurement.instrument_id,
             "instrument_profile_id": measurement.instrument_profile_id,
@@ -576,6 +599,8 @@ class STSoilAnalyzer:
             "model_name": model.model_name,
             "model_family": model.model_family,
             "dataset_source": model._training_dataset_source,
+            "training_dataset_source": model._training_dataset_source,
+            "measurement_dataset_source": measurement.dataset_source,
         }
 
         diagnostics_block: dict[str, Any] = {
@@ -661,8 +686,19 @@ class STSoilAnalyzer:
 
         batch_xai_hsic: dict[str, Any] | None = None
         if include_xai and len(valid_recs) >= 4:
-            xai_batch_report = self.explain(valid_recs)
-            batch_xai_hsic = xai_batch_report.dataset_dependence_hsic.to_dict()
+            fused_valid = self._artifact.fusion_pipeline.build_feature_vector(
+                valid_recs,
+                chemometric_pipeline=self._artifact.chemometric_pipeline,
+            )
+            batch_preds = np.asarray(self._artifact.model.predict(fused_valid.X_fused), dtype=float)
+            if batch_preds.ndim == 2:
+                batch_preds = batch_preds[:, 0]
+            batch_hsic = compute_feature_hsic_ranking(
+                fused_valid.X_fused,
+                batch_preds.reshape(-1),
+                feature_names=fused_valid.fused_feature_names,
+            )
+            batch_xai_hsic = batch_hsic.to_dict()
 
         elapsed_ms = (time.perf_counter() - t_start) * 1000.0
         return BatchPredictionResult(

@@ -132,7 +132,9 @@ def evaluate_signal_qc(
         )
 
     # 4. SNR estimation (for 2D replicate series, compute inter-shot SNR when possible)
-    if vals.ndim == 2 and vals.shape[0] >= 3:
+    if not np.any(mask):
+        snr_est = 0.0
+    elif vals.ndim == 2 and vals.shape[0] >= 3:
         shot_noise = float(np.mean(np.std(vals[:, mask], axis=0)))
         if shot_noise <= 1e-12:
             snr_est = 0.0 if signal_std < cfg.min_signal_std else 1000.0

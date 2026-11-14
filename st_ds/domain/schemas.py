@@ -684,10 +684,10 @@ class TargetLabelSchema:
     closure_tolerance_pct: float = 0.05
     taxonomy_version: str = "provisional_taxonomy_v0"
     class_labels: tuple[str, ...] = (
-        "low_organic_low_carbonate",
-        "low_organic_calcareous",
-        "humus_rich_non_calcareous",
-        "humus_rich_calcareous",
+        "low_carbon_mineral",
+        "calcareous_mineral",
+        "humic_mineral",
+        "organic_rich",
     )
 
     def __post_init__(self) -> None:

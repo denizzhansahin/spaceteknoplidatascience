@@ -94,24 +94,28 @@ class PLSRRegressor(BaseSoilRegressor):
         splitter, g_arr = _make_inner_splitter(n_samples, self.inner_cv_folds, groups)
         folds = list(splitter.split(X_arr, y_2d, g_arr))
         min_train_fold = min(len(tr) for tr, _ in folds)
-        max_k = max(1, min(self.max_components, n_features, min_train_fold - 1))
+        if min_train_fold < 2:
+            best_k = 1
+            best_oof_res_var = np.maximum(np.var(y_2d, axis=0), self.min_std * self.min_std)
+        else:
+            max_k = max(1, min(self.max_components, n_features, min_train_fold - 1))
 
-        best_k = 1
-        best_mse = float("inf")
-        best_oof_res_var = np.var(y_2d, axis=0)
+            best_k = 1
+            best_mse = float("inf")
+            best_oof_res_var = np.var(y_2d, axis=0)
 
-        for k in range(1, max_k + 1):
-            oof_preds = np.zeros_like(y_2d, dtype=float)
-            for tr_idx, va_idx in folds:
-                est = PLSRegression(n_components=k, scale=self.scale)
-                est.fit(X_arr[tr_idx], y_2d[tr_idx])
-                oof_preds[va_idx] = _pls_predict(est, X_arr[va_idx])
-            diff = y_2d - oof_preds
-            mse = float(np.mean(diff * diff))
-            if mse < best_mse:
-                best_mse = mse
-                best_k = k
-                best_oof_res_var = np.mean(diff * diff, axis=0)
+            for k in range(1, max_k + 1):
+                oof_preds = np.zeros_like(y_2d, dtype=float)
+                for tr_idx, va_idx in folds:
+                    est = PLSRegression(n_components=k, scale=self.scale)
+                    est.fit(X_arr[tr_idx], y_2d[tr_idx])
+                    oof_preds[va_idx] = _pls_predict(est, X_arr[va_idx])
+                diff = y_2d - oof_preds
+                mse = float(np.mean(diff * diff))
+                if mse < best_mse:
+                    best_mse = mse
+                    best_k = k
+                    best_oof_res_var = np.mean(diff * diff, axis=0)
 
         self.selected_n_components_ = best_k
         self._cv_residual_std_ = np.maximum(np.sqrt(best_oof_res_var), self.min_std)

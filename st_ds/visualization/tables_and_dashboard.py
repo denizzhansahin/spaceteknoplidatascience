@@ -334,7 +334,9 @@ def build_and_export_tables(
         ci = cm.get("confidence_interval") or {}
         cs = rep.carbon_stock or {}
         unc = cs.get("uncertainty") or {}
-        pred_val = cm.get(ctx.target_name) or cm.get("soc_pct")
+        pred_val = cm.get(ctx.target_name)
+        if pred_val is None and ctx.target_name in ("soc_pct", "sic_pct", "tc_pct"):
+            pred_val = cm.get("soc_pct")
         pred_str = f"{float(pred_val):.3f}" if pred_val is not None else "-"
         ci_str = (
             f"[{float(ci['lower_pct']):.2f}, {float(ci['upper_pct']):.2f}]"

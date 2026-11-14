@@ -73,6 +73,16 @@ def gaussian_nll_loss(
     return (element_loss * m).sum() / denom
 
 
+def _masked_mean(values: torch.Tensor, mask: torch.Tensor | None) -> torch.Tensor:
+    """Compute masked mean, returning zero when an explicit mask selects zero samples."""
+    if mask is None:
+        return values.mean()
+    count = mask.sum()
+    if count <= 0:
+        return values.new_zeros(())
+    return (values * mask.to(dtype=values.dtype)).sum() / count
+
+
 class STSoilMultiTaskLoss(nn.Module):
     """Multi-task objective balancing SOC/SIC uncertainty, taxonomy CE, and TC=SOC+SIC closure."""
 
@@ -120,11 +130,7 @@ class STSoilMultiTaskLoss(nn.Module):
                     reduction="none",
                     delta=self.config.huber_delta,
                 )
-                l_h_soc = (
-                    (h_el * soc_mask.to(dtype=h_el.dtype)).sum() / torch.clamp(soc_mask.sum(), min=1.0)
-                    if soc_mask is not None and soc_mask.sum() > 0
-                    else h_el.mean()
-                )
+                l_h_soc = _masked_mean(h_el, soc_mask)
                 total_loss = total_loss + self.config.lambda_huber * l_h_soc
                 breakdown["loss_soc_huber"] = float(l_h_soc.detach().cpu().item())
 
@@ -148,11 +154,7 @@ class STSoilMultiTaskLoss(nn.Module):
                     reduction="none",
                     delta=self.config.huber_delta,
                 )
-                l_h_sic = (
-                    (h_el * sic_mask.to(dtype=h_el.dtype)).sum() / torch.clamp(sic_mask.sum(), min=1.0)
-                    if sic_mask is not None and sic_mask.sum() > 0
-                    else h_el.mean()
-                )
+                l_h_sic = _masked_mean(h_el, sic_mask)
                 total_loss = total_loss + self.config.lambda_huber * l_h_sic
                 breakdown["loss_sic_huber"] = float(l_h_sic.detach().cpu().item())
 
@@ -164,11 +166,7 @@ class STSoilMultiTaskLoss(nn.Module):
                 reduction="none",
                 delta=self.config.huber_delta,
             )
-            l_tc = (
-                (tc_err * tc_mask.to(dtype=tc_err.dtype)).sum() / torch.clamp(tc_mask.sum(), min=1.0)
-                if tc_mask is not None and tc_mask.sum() > 0
-                else tc_err.mean()
-            )
+            l_tc = _masked_mean(tc_err, tc_mask)
             total_loss = total_loss + self.config.lambda_tc * l_tc
             breakdown["loss_tc"] = float(l_tc.detach().cpu().item())
 

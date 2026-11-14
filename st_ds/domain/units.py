@@ -177,6 +177,8 @@ class UnitRegistry:
             "ω": lambda v: v,
             "kohm": lambda v: v * 1000.0,
             "mohm": lambda v: v * 1e6,
+            "milliohm": lambda v: v * 1e-3,
+            "megaohm": lambda v: v * 1e6,
         },
         "frequency": {
             "hz": lambda v: v,
@@ -260,6 +262,12 @@ class UnitRegistry:
             )
 
         unit_key = cls.normalize_unit_key(unit)
+        if quantity_type == "impedance" and isinstance(unit, str):
+            raw_unit = unit.strip()
+            if raw_unit in ("mΩ", "mOhm", "mOhms", "mohms_milli"):
+                unit_key = "milliohm"
+            elif raw_unit in ("MΩ", "MOhm", "MOhms"):
+                unit_key = "megaohm"
         converters = cls._CONVERTERS[quantity_type]
         if unit_key not in converters:
             raise UnitError(

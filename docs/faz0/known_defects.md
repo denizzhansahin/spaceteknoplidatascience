@@ -159,10 +159,20 @@ Bu belge, kaynak PDF'teki ilk kod taslağının (`ChemometricProcessor`, `SoilXA
 
 ## 4. Faz Bazlı Hata Kapatma Takvimi (Defect Closure Matrix)
 
-| Faz | Kapatılacak Hatalar | Doğrulama Kapısı (Acceptance Gate) |
-| :--- | :--- | :--- |
-| **Faz 1–2** | `DEF-003` (Şema kısmı), `DEF-005` (Birim/Şema kısmı), `DEF-009` (Split kısmı) | `tests/contract/test_schema_validation.py`, `tests/unit/test_grouped_splits.py` |
-| **Faz 3–4** | `DEF-001` (EPO uzay), `DEF-002` (SG $\lambda$ türevi), `DEF-007` (ISS yönü) | `tests/unit/test_epo.py`, `tests/unit/test_savgol.py`, `tests/unit/test_radiometry.py` |
-| **Faz 5–6** | `DEF-003` (Model/Feature kısmı), `DEF-008` (Model kısıtları), `DEF-009` (Eğitim) | `tests/unit/test_feature_fusion.py`, `tests/unit/test_models.py` |
-| **Faz 8–9** | `DEF-004` (XAI 4 alt kusur), `DEF-005` (Karbon stoku), `DEF-008` (Closure) | `tests/unit/test_xai.py`, `tests/unit/test_carbon_stock.py` |
-| **Faz 10** | `DEF-006` (Güvenli artifact yükleme ve tam API sözleşmesi) | `tests/contract/test_artifact_security.py`, `tests/integration/test_end_to_end.py` |
+| Faz | Kapatılacak Hatalar | Doğrulama Kapısı (Acceptance Gate) | Durum |
+| :--- | :--- | :--- | :--- |
+| **Faz 1–2** | `DEF-003` (Şema kısmı), `DEF-005` (Birim/Şema kısmı), `DEF-009` (Split kısmı) | `tests/unit/test_faz1_domain_and_units.py`, `tests/unit/test_faz2_dataset_splits_synthetic.py` | **Kapatıldı** |
+| **Faz 3–4** | `DEF-001` (EPO uzay), `DEF-002` (SG $\lambda$ türevi), `DEF-007` (ISS yönü) | `tests/unit/test_faz3_calibration_and_signal_qc.py`, `tests/unit/test_faz4_chemometrics_and_epo.py` | **Kapatıldı** |
+| **Faz 5–6** | `DEF-003` (Model/Feature kısmı), `DEF-008` (Model kısıtları), `DEF-009` (Eğitim) | `tests/unit/test_faz5_feature_fusion.py`, `tests/unit/test_faz6_models_and_trainer.py` | **Kapatıldı** |
+| **Faz 8–9** | `DEF-004` (XAI 4 alt kusur), `DEF-005` (Karbon stoku), `DEF-008` (Closure) | `tests/unit/test_faz8_xai.py`, `tests/unit/test_faz9_carbon_and_spatial.py` | **Kapatıldı** |
+| **Faz 10** | `DEF-006` (Güvenli artifact yükleme ve tam API sözleşmesi) | `tests/contract/test_artifact_security.py`, `tests/unit/test_faz10_api_and_cli.py`, `tests/integration/test_end_to_end_pipeline.py` | **Kapatıldı** |
+
+---
+
+## 5. MVP Sonrası Kod Denetimi ve Regresyon Kapatma Kaydı (14 Kasım 2026)
+
+`v0.1.0` kod tabanı üzerinde yapılan uçtan uca incelemede tespit edilen ek uygulama kusurları ve kenar durumlar giderilerek `tests/unit/test_bugfix_regressions.py` altında kalıcı regresyon testlerine bağlanmıştır:
+
+1. **Tekil vs. Çoklu Hedef Yalıtımı (`st_ds/api/analyzer.py`, `st_ds/models/hybrid_net.py`, `st_ds/models/loss.py`):** `tc_pct`/`sic_pct` tekil hedeflerinin `soc_pct` alanına yazılması önlendi; `STSoilMultiTaskLoss` maskesi `False` olan hedeflerde kayıp bileşenini kesin `0.0` tutacak şekilde düzeltildi; çok görevli `STSoilHybridNetRegressor` artefakt dönüşümünde 2D `background_targets` ve `mc_dropout_samples` korundu.
+2. **Toplu Çıkarım PDF & Karma Köken İzolasyonu (`st_ds/reporting/pdf_report.py`, `st_ds/api/analyzer.py`):** `BatchPredictionResult.to_dict()` çıktısındaki `"errors"` anahtarı okunacak ve `None` kısmi hata kayıtları güvenle atlanacak şekilde düzeltildi; `provenance` içinde `training_dataset_source` ile `measurement_dataset_source` ayrıştırıldı.
+3. **Taksonomi, Protokol ve Kenar Durumlar (`st_ds/domain/schemas.py`, `st_ds/carbon/fractions.py`, `st_ds/io/reference_store.py`, `st_ds/domain/units.py`, `st_ds/signal/qc.py`, `st_ds/calibration/wavelength.py`, `st_ds/models/baselines.py`, `st_ds/visualization/model_plots.py`):** `TargetLabelSchema.class_labels` ile `PROVISIONAL_CLASS_LABELS` birleştirildi; `AnalyzerProtocol` çalışma zamanı uyumluluğu ve `predict_batch` `batch_xai_hsic` desteği eklendi; katı CSV boolean ayrıştırması, `mΩ`/`MΩ` birimleri, sıfır-geçerli-kanal QC, `valid_mask` hizalama korunumu, küçük örneklem `PLSRRegressor` ve sabit `y_true` parite grafiği korumaları doğrulandı.

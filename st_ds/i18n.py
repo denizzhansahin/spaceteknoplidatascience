@@ -16,6 +16,10 @@ MESSAGES: dict[str, dict[LangCode, str]] = {
         "tr": "VERİ KAYNAĞI: SENTETİK (Sadece doğrulama amaçlıdır; saha kalibrasyonu yerine geçmez)",
         "en": "DATA SOURCE: SYNTHETIC (Pipeline verification only; NOT field calibration)",
     },
+    "badge_mixed_synthetic": {
+        "tr": "KÖKEN UYARISI: SENTETİK BİLEŞEN ({detail}) — Saha kalibrasyonu yerine geçmez!",
+        "en": "PROVENANCE WARNING: SYNTHETIC COMPONENT ({detail}) — NOT field calibration!",
+    },
     "badge_real": {
         "tr": "VERİ KAYNAĞI: GERÇEK SAHA / LABORATUVAR ÖLÇÜMÜ",
         "en": "DATA SOURCE: REAL FIELD / LABORATORY MEASUREMENT",

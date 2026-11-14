@@ -224,8 +224,9 @@ def plot_09_parity_and_ci90(
     grid = np.linspace(vmin - pad, vmax + pad, 50)
     ax.plot(grid, grid, linestyle="--", color="#1A202C", linewidth=1.6, label=pick_text(config.lang, tr="1:1 İdeal Doğru", en="1:1 Ideal Line"))
 
-    slope, intercept = np.polyfit(yt, yp, 1)
-    ax.plot(grid, slope * grid + intercept, linestyle="-", color=PALETTE["vermilion"], linewidth=1.5, label=pick_text(config.lang, tr=f"Regresyon: y={slope:.2f}x+{intercept:.2f}", en=f"Regression: y={slope:.2f}x+{intercept:.2f}"))
+    if float(np.ptp(yt)) > 1e-12:
+        slope, intercept = np.polyfit(yt, yp, 1)
+        ax.plot(grid, slope * grid + intercept, linestyle="-", color=PALETTE["vermilion"], linewidth=1.5, label=pick_text(config.lang, tr=f"Regresyon: y={slope:.2f}x+{intercept:.2f}", en=f"Regression: y={slope:.2f}x+{intercept:.2f}"))
 
     coverage = float(np.mean((yt >= lo) & (yt <= hi)))
     stats_box = (

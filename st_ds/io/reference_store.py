@@ -104,13 +104,27 @@ class ReferenceLabelStore:
                 return None
             return str(val)
 
+        def _parse_bool(val: object, *, default: bool) -> bool:
+            if val is None or pd.isna(val):  # type: ignore[arg-type]
+                return default
+            if isinstance(val, bool) or type(val).__name__ == "bool_":
+                return bool(val)
+            text = str(val).strip().lower()
+            if text in ("", "nan", "none"):
+                return default
+            if text in ("1", "true", "yes", "y", "t"):
+                return True
+            if text in ("0", "false", "no", "n", "f"):
+                return False
+            raise SchemaError(f"Invalid boolean value '{val}' in reference CSV '{csv_path}'.")
+
         labels: dict[str, SoilReference] = {}
         for _, row in df.iterrows():
             sid = str(row["sample_id"]).strip()
             if sid in labels:
                 raise SchemaError(f"Duplicate sample_id '{sid}' in reference CSV '{csv_path}'.")
             unit = _opt_str(row.get("unit")) or "pct"
-            derive = bool(row.get("is_soc_derived_from_difference", False))
+            derive = _parse_bool(row.get("is_soc_derived_from_difference"), default=False)
             cls_id_raw = row.get("soil_class_id")
             cls_id = int(cls_id_raw) if cls_id_raw is not None and not pd.isna(cls_id_raw) else None
 
@@ -119,7 +133,7 @@ class ReferenceLabelStore:
                 sic=_opt_float(row.get("sic_pct")),
                 tc=_opt_float(row.get("tc_pct")),
                 unit=unit,
-                dry_matter_basis=bool(row.get("dry_matter_basis", True)),
+                dry_matter_basis=_parse_bool(row.get("dry_matter_basis"), default=True),
                 soc_method=_opt_str(row.get("soc_method")) or "dry_combustion_acid_pretreated_iso10694",
                 sic_method=_opt_str(row.get("sic_method")) or "calcimeter_iso10693",
                 tc_method=_opt_str(row.get("tc_method")) or "dry_combustion_dumas_iso10694",

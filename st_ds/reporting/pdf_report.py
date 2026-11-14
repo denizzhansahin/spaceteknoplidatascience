@@ -50,6 +50,28 @@ def _configure_pdf_fonts() -> None:
     )
 
 
+def _format_pdf_provenance_badge(
+    dataset_source: str,
+    training_dataset_source: str | None,
+    lang: LangCode,
+) -> tuple[str, str, bool]:
+    """Return (badge_text, badge_color, is_synthetic_involved) obeying Risk 9 dual-source provenance."""
+    meas_norm = str(dataset_source or "synthetic").lower()
+    train_norm = str(training_dataset_source).lower() if training_dataset_source else meas_norm
+    is_synth = ("synthetic" in meas_norm) or ("synthetic" in train_norm)
+    if training_dataset_source and meas_norm != train_norm:
+        detail = f"model={training_dataset_source}, data={dataset_source}"
+        badge = (
+            t("badge_mixed_synthetic", lang, detail=detail)
+            if is_synth
+            else f"{t('badge_real', lang)} | model={training_dataset_source}, data={dataset_source}"
+        )
+    else:
+        badge = t("badge_synthetic" if is_synth else "badge_real", lang)
+    badge_color = "#B7791F" if is_synth else "#276749"
+    return badge, badge_color, is_synth
+
+
 def _new_pdf_page(
     header_title: str,
     header_sub: str,
@@ -57,6 +79,7 @@ def _new_pdf_page(
     lang: LangCode,
     page_num: int,
     dataset_source: str = "synthetic",
+    training_dataset_source: str | None = None,
 ) -> tuple[Figure, Any]:
     fig = plt.figure(figsize=_PAGE_SIZE, facecolor="#FFFFFF")
     ax = fig.add_axes([0.0, 0.0, 1.0, 1.0])
@@ -80,9 +103,7 @@ def _new_pdf_page(
     )
 
     # Bottom footer with provenance & page index
-    is_synth = str(dataset_source).lower() == "synthetic"
-    badge = t("badge_synthetic" if is_synth else "badge_real", lang)
-    badge_color = "#B7791F" if is_synth else "#276749"
+    badge, badge_color, _ = _format_pdf_provenance_badge(dataset_source, training_dataset_source, lang)
     ax.plot([0.03, 0.97], [0.045, 0.045], color="#E2E8F0", linewidth=0.9)
     ax.text(0.03, 0.022, badge, color=badge_color, fontsize=7.8, fontweight="bold", va="center")
     page_lbl = pick_text(lang, tr=f"Sayfa {page_num}", en=f"Page {page_num}")
@@ -167,6 +188,7 @@ def _render_table_section(
     lang: LangCode,
     page_counter: list[int],
     dataset_source: str,
+    training_dataset_source: str | None = None,
     max_rows_per_page: int = 20,
 ) -> None:
     if not rows:
@@ -181,6 +203,7 @@ def _render_table_section(
             lang=lang,
             page_num=page_counter[0],
             dataset_source=dataset_source,
+            training_dataset_source=training_dataset_source,
         )
         ax_tbl = fig.add_axes([0.04, 0.08, 0.92, 0.79])
         ax_tbl.axis("off")
@@ -518,20 +541,38 @@ def generate_prediction_pdf_report(
     now_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
     # Normalize payload shape (single PredictionReport, batch_prediction_result, or CLI train summary)
+    train_source: str | None = None
     if "results" in payload and isinstance(payload["results"], list):
-        records = list(payload["results"])
-        failures = list(payload.get("failures") or [])
+        records = [dict(r) for r in payload["results"] if isinstance(r, Mapping)]
+        failures = list(payload.get("failures") or payload.get("errors") or [])
         ds_source = "synthetic"
         if records:
-            ds_source = str((records[0].get("provenance") or {}).get("dataset_source", "synthetic"))
+            ident0 = records[0].get("identity") or {}
+            prov0 = records[0].get("provenance") or {}
+            train_source = str(prov0.get("training_dataset_source") or prov0.get("dataset_source") or "synthetic")
+            ds_source = str(
+                ident0.get("dataset_source")
+                or prov0.get("measurement_dataset_source")
+                or train_source
+            )
     elif "carbon_metrics" in payload:
         records = [dict(payload)]
         failures = []
-        ds_source = str((payload.get("provenance") or {}).get("dataset_source", "synthetic"))
+        ident0 = payload.get("identity") or {}
+        prov0 = payload.get("provenance") or {}
+        train_source = str(prov0.get("training_dataset_source") or prov0.get("dataset_source") or "synthetic")
+        ds_source = str(
+            ident0.get("dataset_source")
+            or prov0.get("measurement_dataset_source")
+            or train_source
+        )
     else:
         records = []
-        failures = []
+        failures = list(payload.get("failures") or payload.get("errors") or [])
         ds_source = str(payload.get("dataset_source", "synthetic"))
+        train_source = ds_source
+
+    eff_source_policy = "synthetic" if ("synthetic" in ds_source.lower() or "synthetic" in str(train_source or "").lower()) else ds_source
 
     page_counter = [1]
     with PdfPages(pdf_path) as pdf:
@@ -541,11 +582,12 @@ def generate_prediction_pdf_report(
             lang=eff_lang,
             page_num=page_counter[0],
             dataset_source=ds_source,
+            training_dataset_source=train_source,
         )
 
         n_ok = len(records)
         n_fail = len(failures)
-        cmd_name = str(payload.get("command") or ("batch_predict" if n_ok > 1 else "prediction_report"))
+        cmd_name = str(payload.get("command") or ("batch_predict" if (n_ok + n_fail) > 1 else "prediction_report"))
         art_id = str(
             payload.get("artifact_id")
             or ((records[0].get("provenance") or {}).get("artifact_id") if records else "-")
@@ -566,10 +608,15 @@ def generate_prediction_pdf_report(
             ],
         )
 
+        src_detail = (
+            f"{eff_source_policy} (model={train_source}, data={ds_source})"
+            if train_source and train_source != ds_source
+            else eff_source_policy
+        )
         meta_lines = [
             pick_text(eff_lang, tr=f"• Rapor Tarihi (UTC): {now_str}", en=f"• Report Timestamp (UTC): {now_str}"),
             pick_text(eff_lang, tr=f"• STDS Sürüm / Şema: v{__version__} / {SCHEMA_VERSION}", en=f"• STDS Version / Schema: v{__version__} / {SCHEMA_VERSION}"),
-            pick_text(eff_lang, tr=f"• Veri Kaynağı Politikası: {ds_source}", en=f"• Dataset Source Policy: {ds_source}"),
+            pick_text(eff_lang, tr=f"• Veri Kaynağı Politikası: {src_detail}", en=f"• Dataset Source Policy: {src_detail}"),
             pick_text(eff_lang, tr=f"• Toplam Kayıt / Kısmi Hata: {n_ok} / {n_fail}", en=f"• Total Records / Partial Failures: {n_ok} / {n_fail}"),
         ]
         if "selected_model" in payload:
@@ -660,7 +707,11 @@ def generate_prediction_pdf_report(
                 ci = cm.get("confidence_interval") or {}
                 cs = r.get("carbon_stock") or {}
                 diag = r.get("diagnostics") or {}
-                ci_txt = f"[{ci.get('lower_pct'):.2f}, {ci.get('upper_pct'):.2f}]" if "lower_pct" in ci and "upper_pct" in ci else "-"
+                ci_txt = (
+                    f"[{float(ci['lower_pct']):.2f}, {float(ci['upper_pct']):.2f}]"
+                    if ci.get("lower_pct") is not None and ci.get("upper_pct") is not None
+                    else "-"
+                )
                 st_val = cs.get("stock_mg_ha") if isinstance(cs, dict) else None
                 rows.append(
                     [
@@ -684,6 +735,35 @@ def generate_prediction_pdf_report(
                 lang=eff_lang,
                 page_counter=page_counter,
                 dataset_source=ds_source,
+                training_dataset_source=train_source,
+                max_rows_per_page=18,
+            )
+
+        if failures:
+            f_headers = (
+                ["İndeks", "Örnek ID", "Hata Kodu", "Mesaj"]
+                if eff_lang == "tr"
+                else ["Index", "Sample ID", "Error Code", "Message"]
+            )
+            f_rows = [
+                [
+                    str(f.get("index", "-")),
+                    str(f.get("sample_id") or "-"),
+                    str(f.get("error_code") or "-"),
+                    str(f.get("message") or "-")[:90],
+                ]
+                for f in failures
+            ]
+            _render_table_section(
+                pdf,
+                title=pick_text(eff_lang, tr="Kısmi Hata / Başarısız Kayıtlar", en="Partial Failure Records"),
+                subtitle=pick_text(eff_lang, tr="fail_fast=False altında izole edilen kayıt hataları", en="Sample-level errors isolated under fail_fast=False"),
+                headers=f_headers,
+                rows=f_rows,
+                lang=eff_lang,
+                page_counter=page_counter,
+                dataset_source=ds_source,
+                training_dataset_source=train_source,
                 max_rows_per_page=18,
             )
 

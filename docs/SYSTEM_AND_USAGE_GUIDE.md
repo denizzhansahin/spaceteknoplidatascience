@@ -59,9 +59,8 @@ Measurement (Spektrum + Eş Değişkenler + Konum + Çevre Meta Verisi)
 | `st_ds.api` | Dışa açık sabit tüketici cephesi | `STSoilAnalyzer`, `BatchPredictionResult`, `BatchFailureRecord`, `PUBLIC_API_VERSION` |
 | `st_ds.config` / `st_ds.i18n` | İsteğe bağlı `.env` okuyucusu ve çift dilli (`TR`/`EN`) metin motoru | `resolve_lang`, `get_runtime_config`, `STDSRuntimeConfig`, `pick_text`, `t` |
 | `st_ds.reporting` | Çok sayfalı A4 yatay kapsamlı bilimsel PDF rapor üreteci | `generate_analysis_pdf_report`, `generate_prediction_pdf_report` |
-| `st_ds.visualization` | 26+ 2D/3D grafik, 5 CSV/MD tablo, etkileşimli 3D HTML ve pano | `generate_full_visualization_suite`, `VisualizationConfig`, `VisualizationReport` |
+| `st_ds.visualization` | 26+ bilimsel 2D/3D grafik, 5 CSV/MD tablosu, etkileşimli 3D HTML ve çevrimdışı HTML panosu | `generate_full_visualization_suite`, `VisualizationConfig`, `VisualizationReport` |
 | `st_ds.cli` | `st-ds` komut satırı arayüzü | `build_parser`, `main` (`python -m st_ds.cli` / `st-ds`) |
-| `st_ds.visualization` | 26+ bilimsel 2D/3D grafik, 5 CSV/MD tablosu ve çevrimdışı HTML panosu | `generate_full_visualization_suite`, `VisualizationConfig`, `VisualizationReport` |
 | `st_ds.validation` | Faz 11 bilimsel holdout, replay, profilleme ve Model Kartı | `run_scientific_holdout_check`, `verify_deterministic_replay`, `profile_inference_and_load`, `build_model_card_markdown` |
 
 ---
@@ -215,7 +214,7 @@ Her tekil tahmin aşağıdaki kök anahtarlara sahip standart Appendix B JSON ya
 - `classification`: Geçici spektral/karbon sınıf olasılıkları
 - `quality`: `QualityMetadata` (`quality_score`, `flags`, `missing_covariates`, `notes`)
 - `xai`: `include_xai=True` ise yerel duyarlılık, IG, HSIC (batch `B >= 4`) ve grup sıralamaları
-- `provenance`: `stds_package_version`, `api_version`, `schema_version`, `artifact_id`, `artifact_sha256`, `model_name`, `dataset_source`
+- `provenance`: `stds_package_version`, `api_version`, `schema_version`, `artifact_id`, `artifact_sha256`, `model_name`, `dataset_source`, `training_dataset_source`, `measurement_dataset_source`
 - `diagnostics`: `ood_score`, `is_ood`, `snr_estimate`, `stage_timings_ms`, `warning_codes`
 
 ---

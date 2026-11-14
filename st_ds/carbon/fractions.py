@@ -16,6 +16,12 @@ from st_ds.domain.quality import QualityFlag, QualityStatus
 from st_ds.domain.units import UnitRegistry
 
 PROVISIONAL_TAXONOMY_VERSION = "provisional_taxonomy_v0"
+PROVISIONAL_CLASS_LABELS: tuple[str, ...] = (
+    "low_carbon_mineral",
+    "calcareous_mineral",
+    "humic_mineral",
+    "organic_rich",
+)
 
 
 @dataclass(frozen=True)

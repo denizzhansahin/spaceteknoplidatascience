@@ -404,7 +404,12 @@ def _deserialize_model_from_bundle(
             dropout=cfg.dropout,
             n_classes=cfg.n_classes,
             enable_tc_head=cfg.enable_tc_head,
+            epochs=int(params.get("epochs", 60)),
+            batch_size=int(params.get("batch_size", 32)),
+            learning_rate=float(params.get("learning_rate", 2e-3)),
+            weight_decay=float(params.get("weight_decay", 1e-4)),
             loss_config=MultiTaskLossConfig(),
+            mc_dropout_samples=int(params.get("mc_dropout_samples", 1)),
             seed=cfg.seed,
             target_names=target_names,
             min_std=min_std,
@@ -647,11 +652,14 @@ def save_artifact(
     if background_features is not None:
         bg_x = np.asarray(background_features, dtype=np.float64)
         if bg_x.ndim == 2 and bg_x.shape[0] > 0:
-            npz_arrays["xai_background_X"] = bg_x[:128]
+            bg_x_slice = bg_x[:128]
+            npz_arrays["xai_background_X"] = bg_x_slice
             if background_targets is not None:
-                bg_y = np.asarray(background_targets, dtype=np.float64).reshape(-1)
-                if bg_y.shape[0] >= bg_x[:128].shape[0]:
-                    npz_arrays["xai_background_y"] = bg_y[: bg_x[:128].shape[0]]
+                bg_y = np.asarray(background_targets, dtype=np.float64)
+                if bg_y.ndim <= 1:
+                    bg_y = bg_y.reshape(-1)
+                if bg_y.shape[0] >= bg_x_slice.shape[0]:
+                    npz_arrays["xai_background_y"] = bg_y[: bg_x_slice.shape[0]]
 
     np.savez(npz_path, **npz_arrays)
 
